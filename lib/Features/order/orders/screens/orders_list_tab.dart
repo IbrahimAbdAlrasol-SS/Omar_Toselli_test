@@ -1,22 +1,22 @@
 import 'package:Tosell/core/Model/order/orders/Order.dart';
 import 'package:Tosell/core/Model/order/orders/OrderFilter.dart';
-
 import 'package:Tosell/Features/order/orders/widgets/order_card_item.dart';
 import 'package:Tosell/core/providers/order/orders_provider.dart';
 import 'package:Tosell/core/providers/order/shipments_provider.dart';
 import 'package:Tosell/paging/generic_paged_grid_view.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:Tosell/core/Model/order/orders/Order.dart';
-import 'package:Tosell/core/Model/order/orders/OrderFilter.dart';
-import 'package:Tosell/core/Model/order/orders/Shipment.dart';
-import 'package:Tosell/paging/generic_paged_list_view.dart';
-import 'package:Tosell/paging/generic_paged_grid_view.dart';
-import 'package:Tosell/core/router/app_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:gap/gap.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:Tosell/core/constants/spaces.dart';
+import 'package:Tosell/core/utils/extensions.dart';
+import 'package:Tosell/core/router/app_router.dart';
+import 'package:Tosell/core/widgets/CustomTextFormField.dart';
+import 'package:Tosell/core/widgets/FillButton.dart';
+import 'package:Tosell/core/Model/order/orders/Shipment.dart';
+import 'dart:developer' as developer;
+import 'package:Tosell/paging/generic_paged_list_view.dart';
 
 class OrdersListTab extends ConsumerStatefulWidget {
   final FetchPage<Order> fetchPage;
@@ -73,69 +73,93 @@ class _OrdersListTabState extends ConsumerState<OrdersListTab>
   }
 
   void _createShipment() async {
+    developer.log('🚀 بدء عملية إنشاء شحنة جديدة', name: 'CreateShipment');
+    developer.log('📋 عدد الطلبات المحددة: ${_selectedOrderIds.length}', name: 'CreateShipment');
+    developer.log('📋 معرفات الطلبات المحددة: $_selectedOrderIds', name: 'CreateShipment');
+    
     // التحقق من وجود طلبات محددة
     if (_selectedOrderIds.isEmpty) {
+      developer.log('❌ لا توجد طلبات محددة لإنشاء الشحنة', name: 'CreateShipment');
       _showMessage('يرجى تحديد طلبات لإنشاء الشحنة', Colors.orange);
       return;
     }
 
     // فلترة الطلبات المتاحة فقط (status = 0: Pending أو 1: InPickUpShipment)
+    developer.log('🔍 بدء فلترة الطلبات المتاحة للشحن...', name: 'CreateShipment');
     final availableOrderIds = <String>[];
     final unavailableOrderIds = <String>[];
     
     final ordersState = ref.read(ordersNotifierProvider);
     final currentOrders = ordersState.value ?? [];
+    developer.log('📦 إجمالي الطلبات المحملة: ${currentOrders.length}', name: 'CreateShipment');
     
     for (String orderId in _selectedOrderIds) {
       try {
         final order = currentOrders.where((order) => order.id == orderId).first;
+        developer.log('🔎 فحص الطلب: ID=$orderId, Status=${order.status}, Code=${order.code}', name: 'CreateShipment');
         
         if (order.status == 0 || order.status == 1) {
           availableOrderIds.add(orderId);
+          developer.log('✅ الطلب متاح للشحن: ${order.code}', name: 'CreateShipment');
         } else {
           unavailableOrderIds.add(orderId);
+          developer.log('❌ الطلب غير متاح للشحن: ${order.code} (Status: ${order.status})', name: 'CreateShipment');
         }
       } catch (e) {
         // إذا لم يتم العثور على الطلب، نتجاهله
         unavailableOrderIds.add(orderId);
+        developer.log('⚠️ لم يتم العثور على الطلب: $orderId - $e', name: 'CreateShipment');
       }
     }
 
+    developer.log('📊 نتائج الفلترة:', name: 'CreateShipment');
+    developer.log('  - طلبات متاحة: ${availableOrderIds.length}', name: 'CreateShipment');
+    developer.log('  - طلبات غير متاحة: ${unavailableOrderIds.length}', name: 'CreateShipment');
+    
     if (availableOrderIds.isEmpty) {
+      developer.log('❌ لا توجد طلبات متاحة للشحن', name: 'CreateShipment');
       _showMessage('جميع الطلبات المحددة غير متاحة للشحن.\nيمكن شحن الطلبات في حالة "في الانتظار" أو "في شحنة الاستحصال" فقط.', Colors.orange);
       return;
     }
     
     if (unavailableOrderIds.isNotEmpty) {
+      developer.log('⚠️ تم استبعاد ${unavailableOrderIds.length} طلب غير متاح', name: 'CreateShipment');
       _showMessage('تم استبعاد ${unavailableOrderIds.length} طلب غير متاح للشحن', Colors.orange);
     }
 
-    // تحضير البيانات
-    final orders = availableOrderIds.map((id) => {'orderId': id}).toList();
+    // تحضير البيانات - إرسال قائمة معرفات الطلبات فقط
+    developer.log('📋 تحضير بيانات الشحنة...', name: 'CreateShipment');
+    developer.log('📦 قائمة معرفات الطلبات للشحنة: $availableOrderIds', name: 'CreateShipment');
     
-    final shipmentData = {
-      'delivered': null,
-      'delegateId': null,
-      'merchantId': null,
-      'orders': orders,
-      'priority': null
-    };
+    final shipmentData = availableOrderIds;
+    developer.log('📤 بيانات الشحنة المرسلة: $shipmentData', name: 'CreateShipment');
     
     // إرسال الطلب
+    developer.log('🚀 إرسال طلب إنشاء الشحنة إلى الخادم...', name: 'CreateShipment');
     final result = await ref.read(shipmentsNotifierProvider.notifier)
-        .createShipment(shipmentData: shipmentData);
+        .createShipment(shipmentData: shipmentData, formType: 'pickup');
 
-    // معالجة النتيجة
+    developer.log('📥 استلام نتيجة إنشاء الشحنة:', name: 'CreateShipment');
+    developer.log('  - نجح الإنشاء: ${result.$1 != null}', name: 'CreateShipment');
+    developer.log('  - رسالة الخطأ: ${result.$2 ?? "لا يوجد"}', name: 'CreateShipment');
+    
     if (result.$1 != null) {
+      developer.log('✅ تم إنشاء الشحنة بنجاح', name: 'CreateShipment');
+      developer.log('  - رقم الشحنة: ${result.$1!.code}', name: 'CreateShipment');
+      developer.log('  - معرف الشحنة: ${result.$1!.id}', name: 'CreateShipment');
+      developer.log('  - عدد الطلبات: ${availableOrderIds.length}', name: 'CreateShipment');
       _showMessage('تم إنشاء الشحنة بنجاح (${availableOrderIds.length} طلب)', Colors.green);
       _resetSelection();
     } else {
       // معالجة أنواع الأخطاء المختلفة
       String errorMessage = result.$2 ?? 'فشل في إنشاء الشحنة';
+      developer.log('❌ فشل في إنشاء الشحنة: $errorMessage', name: 'CreateShipment');
       
       if (errorMessage.contains('Order already in shipment')) {
+        developer.log('⚠️ خطأ: طلبات موجودة بالفعل في شحنة أخرى', name: 'CreateShipment');
         errorMessage = 'بعض الطلبات المحددة موجودة بالفعل في شحنة أخرى غير مكتملة.\nيرجى اختيار طلبات أخرى أو التحقق من حالة الطلبات.';
       } else if (errorMessage.contains('400')) {
+        developer.log('⚠️ خطأ 400: بيانات غير صحيحة', name: 'CreateShipment');
         errorMessage = 'خطأ في البيانات المرسلة. يرجى المحاولة مرة أخرى.';
       }
       

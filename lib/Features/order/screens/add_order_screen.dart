@@ -17,6 +17,7 @@ import 'package:Tosell/core/widgets/CustomTextFormField.dart';
 import 'package:Tosell/Features/order/widgets/Geolocator.dart';
 import 'package:Tosell/core/Model/order/add_order_form.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
+import 'dart:developer' as developer;
 
 
 class AddOrderScreen extends ConsumerStatefulWidget {
@@ -91,36 +92,60 @@ class _AddOrderScreenState extends ConsumerState<AddOrderScreen> {
     var orderState = ref.watch(orderCommandsNotifierProvider);
 
     void addOrder() async {
+      developer.log('🎯 AddOrderScreen.addOrder() - بدء عملية إضافة طلب من الواجهة', name: 'AddOrderScreen');
+      
       try {
+        // تسجيل بيانات النموذج قبل الإرسال
+        developer.log('📋 بيانات النموذج من الواجهة:', name: 'AddOrderScreen');
+        developer.log('  - Barcode: ${_barcodeController.text}', name: 'AddOrderScreen');
+        developer.log('  - Customer Name: ${_customerNameController.text}', name: 'AddOrderScreen');
+        developer.log('  - Customer Phone: ${_customerPhoneNumberController.text}', name: 'AddOrderScreen');
+        developer.log('  - Customer Second Phone: ${_customerSecondPhoneNumberController.text}', name: 'AddOrderScreen');
+        developer.log('  - Selected City ID (Delivery Zone): $_SelectedCityId', name: 'AddOrderScreen');
+        developer.log('  - Selected Pickup Zone ID: $selectedPickupZoneId', name: 'AddOrderScreen');
+        developer.log('  - Content: ${_contentController.text}', name: 'AddOrderScreen');
+        developer.log('  - Amount: ${_amountController.text}', name: 'AddOrderScreen');
+        developer.log('  - Size: ${_orderSizeController.text}', name: 'AddOrderScreen');
+        developer.log('  - Note: ${_orderNoteController.text}', name: 'AddOrderScreen');
+        
+        developer.log('📍 الحصول على الموقع الحالي...', name: 'AddOrderScreen');
         var pickupLocation = await getCurrentLocation();
-        final result =
-            await ref.read(orderCommandsNotifierProvider.notifier).addOrder(
-                  AddOrderForm(
-                    code: _barcodeController.text,
-                    customerName: _customerNameController.text,
-                    customerPhoneNumber: _customerPhoneNumberController.text,
-                    customerSecondPhoneNumber:
-                        _customerSecondPhoneNumberController.text,
-                    deliveryZoneId: _SelectedCityId,
-                    note: _orderNoteController.text,
-                    pickupZoneId: selectedPickupZoneId ?? '',
-                    content: _contentController.text,
-                    pickUpLocation: Location(
-                        lat: pickupLocation.latitude.toString(),
-                        long: pickupLocation.longitude.toString()),
-                    size: int.parse(_orderSizeController.text),
-                    amount: _amountController.text,
-                  ),
-                );
-        print("Result: $result");
+        developer.log('📍 الموقع الحالي: lat=${pickupLocation.latitude}, long=${pickupLocation.longitude}', name: 'AddOrderScreen');
+        
+        // إنشاء نموذج الطلب
+        final orderForm = AddOrderForm(
+          code: _barcodeController.text,
+          customerName: _customerNameController.text,
+          customerPhoneNumber: _customerPhoneNumberController.text,
+          customerSecondPhoneNumber: _customerSecondPhoneNumberController.text,
+          deliveryZoneId: _SelectedCityId ?? '412', // استخدام 412 كقيمة افتراضية (الغدير)
+          note: _orderNoteController.text,
+          pickupZoneId: selectedPickupZoneId ?? '',
+          content: _contentController.text,
+          pickUpLocation: Location(
+              lat: pickupLocation.latitude.toString(),
+              long: pickupLocation.longitude.toString()),
+          size: int.parse(_orderSizeController.text),
+          amount: _amountController.text,
+        );
+        
+        developer.log('🚀 إرسال الطلب إلى المزود...', name: 'AddOrderScreen');
+        final result = await ref.read(orderCommandsNotifierProvider.notifier).addOrder(orderForm);
+        
+        developer.log('📡 نتيجة إضافة الطلب في الواجهة:', name: 'AddOrderScreen');
+        developer.log('  - Success: ${result.$1 != null}', name: 'AddOrderScreen');
+        developer.log('  - Order Code: ${result.$1?.code ?? "N/A"}', name: 'AddOrderScreen');
+        developer.log('  - Error: ${result.$2 ?? "N/A"}', name: 'AddOrderScreen');
 
         if (result.$1 == null) {
+          developer.log('❌ فشل في إنشاء الطلب - عرض رسالة خطأ', name: 'AddOrderScreen');
           GlobalToast.show(
             message: result.$2!,
             backgroundColor: Theme.of(context).colorScheme.error,
             textColor: Colors.white,
           );
         } else {
+          developer.log('✅ تم إنشاء الطلب بنجاح - عرض رسالة نجاح والانتقال للطلبات', name: 'AddOrderScreen');
           GlobalToast.show(
             message: "تم انشاء الطلب بنجاح",
             backgroundColor: Colors.green,

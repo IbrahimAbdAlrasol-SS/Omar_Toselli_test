@@ -129,16 +129,7 @@ var orderStatus = [
       icon: 'assets/svg/box.svg',
       description: 'تم الايصال الجزئي للزبون',
       value: 11),
-  //? index = 12 - Rescheduled
-  OrderEnum(
-      name: 'اعادة جدولة',
-      color: const Color(0xFFE8FCF5),
-      iconColor: Colors.black,
-      textColor: Colors.black,
-      icon: 'assets/svg/box.svg',
-      description: 'تم اعادة جدولة موعد الطلب',
-      value: 12),
-  //? index = 13 - Cancelled
+  //? index = 12 - Cancelled
   OrderEnum(
       name: 'ملغي',
       color: const Color(0xFFE8FCF5),
@@ -146,17 +137,8 @@ var orderStatus = [
       textColor: Colors.black,
       icon: 'assets/svg/box.svg',
       description: 'تم الغاء الطلب',
-      value: 13),
-  //? index = 14 - Refunded
-  OrderEnum(
-      name: 'مرتجع',
-      color: const Color(0xFFE8FCF5),
-      iconColor: Colors.black,
-      textColor: Colors.black,
-      icon: 'assets/svg/box.svg',
-      description: 'تم ارجاع الطلب',
-      value: 14),
-  //? index = 15 - Completed
+      value: 12),
+  //? index = 13 - Completed
   OrderEnum(
       name: 'مكتمل',
       color: const Color(0xFFE8FCF5),
@@ -164,7 +146,43 @@ var orderStatus = [
       textColor: Colors.black,
       icon: 'assets/svg/box.svg',
       description: 'تم اكتمال الطلب',
+      value: 13),
+  //? index = 14 - RescheduledInWarehouse
+  OrderEnum(
+      name: 'مؤجل في المستودع',
+      color: const Color(0xFFFFF3E0),
+      iconColor: Colors.orange,
+      textColor: Colors.orange,
+      icon: 'assets/svg/box.svg',
+      description: 'تم تأجيل الطلب في المستودع',
+      value: 14),
+  //? index = 15 - RescheduledDelegate
+  OrderEnum(
+      name: 'مؤجل مندوب',
+      color: const Color(0xFFFFF3E0),
+      iconColor: Colors.orange,
+      textColor: Colors.orange,
+      icon: 'assets/svg/box.svg',
+      description: 'تم تأجيل الطلب من قبل المندوب',
       value: 15),
+  //? index = 16 - RefundedInWarehouse
+  OrderEnum(
+      name: 'مسترد في المستودع',
+      color: const Color(0xFFF3E5F5),
+      iconColor: Colors.purple,
+      textColor: Colors.purple,
+      icon: 'assets/svg/box.svg',
+      description: 'تم استرداد الطلب في المستودع',
+      value: 16),
+  //? index = 17 - RefundedDelegate
+  OrderEnum(
+      name: 'مسترد مندوب',
+      color: const Color(0xFFF3E5F5),
+      iconColor: Colors.purple,
+      textColor: Colors.purple,
+      icon: 'assets/svg/box.svg',
+      description: 'تم استرداد الطلب من قبل المندوب',
+      value: 17),
 //? Order Status Values:
 //? 0-  Pending - في الانتظار
 //? 1-  InPickUpShipment - في شحنة الاستحصال
@@ -178,10 +196,12 @@ var orderStatus = [
 //? 9-  AtDeliveryPoint - في نقطة التوصيل
 //? 10- Delivered - تم التوصيل
 //? 11- PartiallyDelivered - توصيل جزئي
-//? 12- Rescheduled - اعادة جدولة
-//? 13- Cancelled - ملغي
-//? 14- Refunded - مرتجع
-//? 15- Completed - مكتمل
+//? 12- Cancelled - ملغي
+//? 13- Completed - مكتمل
+//? 14- RescheduledInWarehouse - مؤجل في المستودع
+//? 15- RescheduledDelegate - مؤجل مندوب
+//? 16- RefundedInWarehouse - مسترد في المستودع
+//? 17- RefundedDelegate - مسترد مندوب
 ];
 
 // ignore: unused_element
