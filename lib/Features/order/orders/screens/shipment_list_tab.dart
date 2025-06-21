@@ -32,11 +32,16 @@ class _shipmentInfoTabState extends ConsumerState<shipmentInfoTab>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context); 
+    super.build(context);
 
     return GenericPagedListView<Shipment>(
-      itemBuilder: (context, shipment, index) =>
-          ShipmentCartItem(shipment: shipment),
+      itemBuilder: (context, shipment, index) => ShipmentCartItem(
+        shipment: shipment,
+        onTap: () {
+          // التنقل إلى شاشة تفاصيل الشحنة التي تعرض قائمة الطلبات
+          context.push(AppRoutes.shipmentDetails, extra: shipment.code);
+        },
+      ),
       fetchPage: (page, filter) async {
         return await widget.fetchPage(page);
       },

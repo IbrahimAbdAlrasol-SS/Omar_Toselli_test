@@ -46,27 +46,32 @@ class BaseClient<T> {
     required String endpoint,
     required Map<String, dynamic> data,
   }) async {
-    developer.log('🌐 BaseClient.create() - بدء HTTP POST Request', name: 'BaseClient');
+    developer.log('🌐 BaseClient.create() - بدء HTTP POST Request',
+        name: 'BaseClient');
     developer.log('  - URL: $baseUrl$endpoint', name: 'BaseClient');
     developer.log('  - Data: $data', name: 'BaseClient');
-    
+
     try {
       developer.log('📡 إرسال POST request...', name: 'BaseClient');
       final response = await _dio.post(endpoint, data: data);
-      
+
       developer.log('📥 استجابة HTTP:', name: 'BaseClient');
-      developer.log('  - Status Code: ${response.statusCode}', name: 'BaseClient');
+      developer.log('  - Status Code: ${response.statusCode}',
+          name: 'BaseClient');
       developer.log('  - Response Data: ${response.data}', name: 'BaseClient');
-      
+
       final result = _handleResponse(response);
       developer.log('✅ تم معالجة الاستجابة بنجاح', name: 'BaseClient');
       return result;
     } on DioException catch (e) {
-      developer.log('💥 DioException في BaseClient.create():', name: 'BaseClient');
+      developer.log('💥 DioException في BaseClient.create():',
+          name: 'BaseClient');
       developer.log('  - Type: ${e.type}', name: 'BaseClient');
       developer.log('  - Message: ${e.message}', name: 'BaseClient');
-      developer.log('  - Status Code: ${e.response?.statusCode}', name: 'BaseClient');
-      developer.log('  - Response Data: ${e.response?.data}', name: 'BaseClient');
+      developer.log('  - Status Code: ${e.response?.statusCode}',
+          name: 'BaseClient');
+      developer.log('  - Response Data: ${e.response?.data}',
+          name: 'BaseClient');
       return _handleDioError(e);
     }
   }
@@ -176,20 +181,23 @@ class BaseClient<T> {
   }
 
   ApiResponse<T> _handleResponse(Response response) {
-    developer.log('🔄 BaseClient._handleResponse() - معالجة الاستجابة', name: 'BaseClient');
-    developer.log('  - Status Code: ${response.statusCode}', name: 'BaseClient');
-    
+    developer.log('🔄 BaseClient._handleResponse() - معالجة الاستجابة',
+        name: 'BaseClient');
+    developer.log('  - Status Code: ${response.statusCode}',
+        name: 'BaseClient');
+
     if (response.statusCode! >= 200 && response.statusCode! < 300) {
       developer.log('✅ استجابة ناجحة - تحويل البيانات', name: 'BaseClient');
       final result = ApiResponse.fromJsonAuto(response.data, fromJson!);
       developer.log('  - Message: ${result.message}', name: 'BaseClient');
       return result;
     }
-    
+
     developer.log('❌ استجابة فاشلة', name: 'BaseClient');
-    developer.log('  - Error Message: ${response.data['message']}', name: 'BaseClient');
+    developer.log('  - Error Message: ${response.data['message']}',
+        name: 'BaseClient');
     developer.log('  - Errors: ${response.data['errors']}', name: 'BaseClient');
-    
+
     return ApiResponse<T>(
       message: response.data['message'] ?? 'Unknown error',
       data: [],
@@ -199,10 +207,11 @@ class BaseClient<T> {
   }
 
   ApiResponse<T> _handleDioError(DioException e) {
-    developer.log('💥 BaseClient._handleDioError() - معالجة خطأ Dio', name: 'BaseClient');
+    developer.log('💥 BaseClient._handleDioError() - معالجة خطأ Dio',
+        name: 'BaseClient');
     developer.log('  - Exception Type: ${e.type}', name: 'BaseClient');
     developer.log('  - Exception Message: ${e.message}', name: 'BaseClient');
-    
+
     ApiErrorType errorType;
     String message = '';
 
@@ -216,8 +225,10 @@ class BaseClient<T> {
         break;
       case DioExceptionType.badResponse:
         final statusCode = e.response?.statusCode;
-        developer.log('📛 استجابة سيئة - Status Code: $statusCode', name: 'BaseClient');
-        developer.log('  - Response Data: ${e.response?.data}', name: 'BaseClient');
+        developer.log('📛 استجابة سيئة - Status Code: $statusCode',
+            name: 'BaseClient');
+        developer.log('  - Response Data: ${e.response?.data}',
+            name: 'BaseClient');
         if (statusCode == 401) {
           errorType = ApiErrorType.unauthorized;
           message = 'Unauthorized';

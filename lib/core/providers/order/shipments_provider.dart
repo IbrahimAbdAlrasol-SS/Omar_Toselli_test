@@ -21,30 +21,42 @@ class ShipmentsNotifier extends _$ShipmentsNotifier {
     required List<String> shipmentData,
     String? formType,
   }) async {
-    developer.log('🔄 بدء عملية إنشاء الشحنة في Provider', name: 'ShipmentsProvider');
-    developer.log('📋 معرفات الطلبات المستلمة: $shipmentData', name: 'ShipmentsProvider');
-    developer.log('📋 نوع النموذج: ${formType ?? "pickup"}', name: 'ShipmentsProvider');
-    
+    developer.log('🔄 بدء عملية إنشاء الشحنة في Provider',
+        name: 'ShipmentsProvider');
+    developer.log('📋 معرفات الطلبات المستلمة: $shipmentData',
+        name: 'ShipmentsProvider');
+    developer.log('📋 نوع النموذج: ${formType ?? "pickup"}',
+        name: 'ShipmentsProvider');
+
     try {
-      developer.log('📞 استدعاء خدمة إنشاء الشحنة...', name: 'ShipmentsProvider');
-      final result = await _service.createPickupShipment(shipmentData, formType: formType);
-      
+      developer.log('📞 استدعاء خدمة إنشاء الشحنة...',
+          name: 'ShipmentsProvider');
+      final result =
+          await _service.createPickupShipment(shipmentData, formType: formType);
+
       developer.log('📥 نتيجة خدمة إنشاء الشحنة:', name: 'ShipmentsProvider');
-      developer.log('  - نجح الإنشاء: ${result.$1 != null}', name: 'ShipmentsProvider');
-      developer.log('  - رسالة الخطأ: ${result.$2 ?? "لا يوجد"}', name: 'ShipmentsProvider');
-      
+      developer.log('  - نجح الإنشاء: ${result.$1 != null}',
+          name: 'ShipmentsProvider');
+      developer.log('  - رسالة الخطأ: ${result.$2 ?? "لا يوجد"}',
+          name: 'ShipmentsProvider');
+
       if (result.$1 != null) {
-        developer.log('✅ تم إنشاء الشحنة بنجاح، تحديث البيانات...', name: 'ShipmentsProvider');
-        developer.log('  - معرف الشحنة: ${result.$1!.id}', name: 'ShipmentsProvider');
-        developer.log('  - رقم الشحنة: ${result.$1!.code}', name: 'ShipmentsProvider');
+        developer.log('✅ تم إنشاء الشحنة بنجاح، تحديث البيانات...',
+            name: 'ShipmentsProvider');
+        developer.log('  - معرف الشحنة: ${result.$1!.id}',
+            name: 'ShipmentsProvider');
+        developer.log('  - رقم الشحنة: ${result.$1!.code}',
+            name: 'ShipmentsProvider');
         ref.invalidateSelf();
       } else {
-        developer.log('❌ فشل في إنشاء الشحنة: ${result.$2}', name: 'ShipmentsProvider');
+        developer.log('❌ فشل في إنشاء الشحنة: ${result.$2}',
+            name: 'ShipmentsProvider');
       }
-      
+
       return result;
     } catch (e) {
-      developer.log('💥 خطأ في Provider أثناء إنشاء الشحنة: $e', name: 'ShipmentsProvider');
+      developer.log('💥 خطأ في Provider أثناء إنشاء الشحنة: $e',
+          name: 'ShipmentsProvider');
       return (null, e.toString());
     }
   }

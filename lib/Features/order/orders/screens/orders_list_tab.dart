@@ -74,95 +74,124 @@ class _OrdersListTabState extends ConsumerState<OrdersListTab>
 
   void _createShipment() async {
     developer.log('🚀 بدء عملية إنشاء شحنة جديدة', name: 'CreateShipment');
-    developer.log('📋 عدد الطلبات المحددة: ${_selectedOrderIds.length}', name: 'CreateShipment');
-    developer.log('📋 معرفات الطلبات المحددة: $_selectedOrderIds', name: 'CreateShipment');
-    
-    // التحقق من وجود طلبات محددة
+    developer.log('📋 عدد الطلبات المحددة: ${_selectedOrderIds.length}',
+        name: 'CreateShipment');
+    developer.log('📋 معرفات الطلبات المحددة: $_selectedOrderIds',
+        name: 'CreateShipment');
+
     if (_selectedOrderIds.isEmpty) {
-      developer.log('❌ لا توجد طلبات محددة لإنشاء الشحنة', name: 'CreateShipment');
+      developer.log('❌ لا توجد طلبات محددة لإنشاء الشحنة',
+          name: 'CreateShipment');
       _showMessage('يرجى تحديد طلبات لإنشاء الشحنة', Colors.orange);
       return;
     }
 
-    // فلترة الطلبات المتاحة فقط (status = 0: Pending أو 1: InPickUpShipment)
-    developer.log('🔍 بدء فلترة الطلبات المتاحة للشحن...', name: 'CreateShipment');
+    developer.log('🔍 بدء فلترة الطلبات المتاحة للشحن...',
+        name: 'CreateShipment');
     final availableOrderIds = <String>[];
     final unavailableOrderIds = <String>[];
-    
+
     final ordersState = ref.read(ordersNotifierProvider);
     final currentOrders = ordersState.value ?? [];
-    developer.log('📦 إجمالي الطلبات المحملة: ${currentOrders.length}', name: 'CreateShipment');
-    
+    developer.log('📦 إجمالي الطلبات المحملة: ${currentOrders.length}',
+        name: 'CreateShipment');
+
     for (String orderId in _selectedOrderIds) {
       try {
         final order = currentOrders.where((order) => order.id == orderId).first;
-        developer.log('🔎 فحص الطلب: ID=$orderId, Status=${order.status}, Code=${order.code}', name: 'CreateShipment');
-        
-        if (order.status == 0 || order.status == 1) {
+        developer.log(
+            '🔎 فحص الطلب: ID=$orderId, Status=${order.status}, Code=${order.code}',
+            name: 'CreateShipment');
+
+        if (order.status != null && order.status! >= 0 && order.status! <= 17) {
           availableOrderIds.add(orderId);
-          developer.log('✅ الطلب متاح للشحن: ${order.code}', name: 'CreateShipment');
+          developer.log('✅ الطلب متاح للشحن: ${order.code}',
+              name: 'CreateShipment');
         } else {
           unavailableOrderIds.add(orderId);
-          developer.log('❌ الطلب غير متاح للشحن: ${order.code} (Status: ${order.status})', name: 'CreateShipment');
+          developer.log(
+              '❌ الطلب غير متاح للشحن: ${order.code} (Status: ${order.status})',
+              name: 'CreateShipment');
         }
       } catch (e) {
-        // إذا لم يتم العثور على الطلب، نتجاهله
         unavailableOrderIds.add(orderId);
-        developer.log('⚠️ لم يتم العثور على الطلب: $orderId - $e', name: 'CreateShipment');
+        developer.log('⚠️ لم يتم العثور على الطلب: $orderId - $e',
+            name: 'CreateShipment');
       }
     }
 
     developer.log('📊 نتائج الفلترة:', name: 'CreateShipment');
-    developer.log('  - طلبات متاحة: ${availableOrderIds.length}', name: 'CreateShipment');
-    developer.log('  - طلبات غير متاحة: ${unavailableOrderIds.length}', name: 'CreateShipment');
-    
+    developer.log('  - طلبات متاحة: ${availableOrderIds.length}',
+        name: 'CreateShipment');
+    developer.log('  - طلبات غير متاحة: ${unavailableOrderIds.length}',
+        name: 'CreateShipment');
+
     if (availableOrderIds.isEmpty) {
       developer.log('❌ لا توجد طلبات متاحة للشحن', name: 'CreateShipment');
-      _showMessage('جميع الطلبات المحددة غير متاحة للشحن.\nيمكن شحن الطلبات في حالة "في الانتظار" أو "في شحنة الاستحصال" فقط.', Colors.orange);
+      _showMessage(
+          'جميع الطلبات المحددة غير متاحة للشحن.\nيمكن شحن الطلبات في الحالات من 0 إلى 17 فقط.',
+          Colors.orange);
       return;
     }
-    
+
     if (unavailableOrderIds.isNotEmpty) {
-      developer.log('⚠️ تم استبعاد ${unavailableOrderIds.length} طلب غير متاح', name: 'CreateShipment');
-      _showMessage('تم استبعاد ${unavailableOrderIds.length} طلب غير متاح للشحن', Colors.orange);
+      developer.log('⚠️ تم استبعاد ${unavailableOrderIds.length} طلب غير متاح',
+          name: 'CreateShipment');
+      _showMessage(
+          'تم استبعاد ${unavailableOrderIds.length} طلب غير متاح للشحن',
+          Colors.orange);
     }
 
     // تحضير البيانات - إرسال قائمة معرفات الطلبات فقط
     developer.log('📋 تحضير بيانات الشحنة...', name: 'CreateShipment');
-    developer.log('📦 قائمة معرفات الطلبات للشحنة: $availableOrderIds', name: 'CreateShipment');
-    
+    developer.log('📦 قائمة معرفات الطلبات للشحنة: $availableOrderIds',
+        name: 'CreateShipment');
+
     final shipmentData = availableOrderIds;
-    developer.log('📤 بيانات الشحنة المرسلة: $shipmentData', name: 'CreateShipment');
-    
+    developer.log('📤 بيانات الشحنة المرسلة: $shipmentData',
+        name: 'CreateShipment');
+
     // إرسال الطلب
-    developer.log('🚀 إرسال طلب إنشاء الشحنة إلى الخادم...', name: 'CreateShipment');
-    final result = await ref.read(shipmentsNotifierProvider.notifier)
+    developer.log('🚀 إرسال طلب إنشاء الشحنة إلى الخادم...',
+        name: 'CreateShipment');
+    final result = await ref
+        .read(shipmentsNotifierProvider.notifier)
         .createShipment(shipmentData: shipmentData, formType: 'pickup');
 
     developer.log('📥 استلام نتيجة إنشاء الشحنة:', name: 'CreateShipment');
-    developer.log('  - نجح الإنشاء: ${result.$1 != null}', name: 'CreateShipment');
-    developer.log('  - رسالة الخطأ: ${result.$2 ?? "لا يوجد"}', name: 'CreateShipment');
-    
+    developer.log('  - نجح الإنشاء: ${result.$1 != null}',
+        name: 'CreateShipment');
+    developer.log('  - رسالة الخطأ: ${result.$2 ?? "لا يوجد"}',
+        name: 'CreateShipment');
+
     if (result.$1 != null) {
       developer.log('✅ تم إنشاء الشحنة بنجاح', name: 'CreateShipment');
-      developer.log('  - رقم الشحنة: ${result.$1!.code}', name: 'CreateShipment');
-      developer.log('  - معرف الشحنة: ${result.$1!.id}', name: 'CreateShipment');
-      developer.log('  - عدد الطلبات: ${availableOrderIds.length}', name: 'CreateShipment');
-      _showMessage('تم إنشاء الشحنة بنجاح (${availableOrderIds.length} طلب)', Colors.green);
+      developer.log('  - رقم الشحنة: ${result.$1!.code}',
+          name: 'CreateShipment');
+      developer.log('  - معرف الشحنة: ${result.$1!.id}',
+          name: 'CreateShipment');
+      developer.log('  - عدد الطلبات: ${availableOrderIds.length}',
+          name: 'CreateShipment');
+      _showMessage('تم إنشاء الشحنة بنجاح (${availableOrderIds.length} طلب)',
+          Colors.green);
       _resetSelection();
     } else {
       // معالجة أنواع الأخطاء المختلفة
       String errorMessage = result.$2 ?? 'فشل في إنشاء الشحنة';
-      developer.log('❌ فشل في إنشاء الشحنة: $errorMessage', name: 'CreateShipment');
-      
-      if (errorMessage.contains('Order already in shipment')) {
-        developer.log('⚠️ خطأ: طلبات موجودة بالفعل في شحنة أخرى', name: 'CreateShipment');
-        errorMessage = 'بعض الطلبات المحددة موجودة بالفعل في شحنة أخرى غير مكتملة.\nيرجى اختيار طلبات أخرى أو التحقق من حالة الطلبات.';
+      developer.log('❌ فشل في إنشاء الشحنة: $errorMessage',
+          name: 'CreateShipment');
+
+      if (errorMessage.contains('Order already in shipment') ||
+          errorMessage.contains('Order already in another Pickup shipment')) {
+        developer.log('⚠️ خطأ: طلبات موجودة بالفعل في شحنة أخرى',
+            name: 'CreateShipment');
+        errorMessage =
+            'بعض الطلبات المحددة موجودة بالفعل في شحنة أخرى غير مكتملة.\nيرجى اختيار طلبات أخرى أو التحقق من حالة الطلبات.';
       } else if (errorMessage.contains('400')) {
         developer.log('⚠️ خطأ 400: بيانات غير صحيحة', name: 'CreateShipment');
         errorMessage = 'خطأ في البيانات المرسلة. يرجى المحاولة مرة أخرى.';
       }
-      
+
       _showMessage(errorMessage, Colors.red);
     }
   }
@@ -182,7 +211,7 @@ class _OrdersListTabState extends ConsumerState<OrdersListTab>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context); 
+    super.build(context);
 
     return Scaffold(
       body: Column(
