@@ -51,13 +51,10 @@ class _LoginPageState extends ConsumerState<ForgotPasswordNum> {
     //   },
     // );
 
-
 // رتبــها
     return loginState.when(
       data: (data) =>
-          _buildUi(
-            screenHeight, keyboardHeight, context, loginState
-            ),
+          _buildUi(screenHeight, keyboardHeight, context, loginState),
       loading: () =>
           _buildUi(screenHeight, keyboardHeight, context, loginState),
       error: (error, stackTrace) => Center(
@@ -76,6 +73,7 @@ class _LoginPageState extends ConsumerState<ForgotPasswordNum> {
             children: [
               Expanded(
                 child: buildBackground(
+                  context: context,
                   child: Column(
                     crossAxisAlignment:
                         CrossAxisAlignment.start, // محاذاة النصوص لليمين

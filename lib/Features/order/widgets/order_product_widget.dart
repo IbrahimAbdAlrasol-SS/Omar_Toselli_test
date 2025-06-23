@@ -14,7 +14,7 @@ class OrderProductWidget extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         border: Border.all(color: Theme.of(context).colorScheme.outline),
         borderRadius: BorderRadius.circular(114),
       ),
@@ -47,7 +47,8 @@ class OrderProductWidget extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(116),
                   ),
                   child: Icon(CupertinoIcons.play_circle,
-                      color: Colors.white, size: 19.sp),
+                      color: Theme.of(context).colorScheme.onPrimary,
+                      size: 19.sp),
                 ),
               ),
             ],
@@ -73,9 +74,10 @@ class OrderProductWidget extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.all(3),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(4.sp),
-                    border: Border.all(color: Colors.red, width: 1),
+                    border: Border.all(
+                        color: Theme.of(context).colorScheme.error, width: 1),
                   ),
                   child: Icon(
                     CupertinoIcons.minus,
@@ -88,9 +90,10 @@ class OrderProductWidget extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.all(3),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(4.sp),
-                    border: Border.all(),
+                    border: Border.all(
+                        color: Theme.of(context).colorScheme.outline),
                   ),
                   child: Icon(
                     CupertinoIcons.plus,

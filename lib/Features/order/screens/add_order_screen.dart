@@ -1,5 +1,6 @@
 import 'package:Tosell/core/providers/order/order_commands_provider.dart';
 import 'package:Tosell/core/providers/profile/zone_provider.dart';
+import 'package:Tosell/core/utils/extensions.dart';
 import 'package:gap/gap.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
@@ -163,18 +164,16 @@ class _AddOrderScreenState extends ConsumerState<AddOrderScreen> {
           developer.log('❌ فشل في إنشاء الطلب - عرض رسالة خطأ',
               name: 'AddOrderScreen');
           GlobalToast.show(
+            context: context,
             message: result.$2!,
-            backgroundColor: Theme.of(context).colorScheme.error,
-            textColor: Colors.white,
           );
         } else {
           developer.log(
               '✅ تم إنشاء الطلب بنجاح - عرض رسالة نجاح والانتقال للطلبات',
               name: 'AddOrderScreen');
-          GlobalToast.show(
+          GlobalToast.showSuccess(
+            context: context,
             message: "تم انشاء الطلب بنجاح",
-            backgroundColor: Colors.green,
-            textColor: Colors.white,
           );
           if (orderState is AsyncData) {
             context.go(AppRoutes.orders);
@@ -182,9 +181,8 @@ class _AddOrderScreenState extends ConsumerState<AddOrderScreen> {
         }
       } catch (e) {
         GlobalToast.show(
+          context: context,
           message: "حدث خطأ أثناء إرسال الطلب${e.toString()}.",
-          backgroundColor: Theme.of(context).colorScheme.error,
-          textColor: Colors.white,
         );
       }
     }
@@ -519,7 +517,7 @@ class _AddOrderScreenState extends ConsumerState<AddOrderScreen> {
                   Container(
                     padding: AppSpaces.allMedium,
                     decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.surface,
                         border: Border.all(
                           color: Theme.of(context).colorScheme.outline,
                         ),
@@ -530,6 +528,7 @@ class _AddOrderScreenState extends ConsumerState<AddOrderScreen> {
                       label: 'إرسال الطلب',
                       isLoading: orderState.isLoading,
                       onPressed: () => addOrder(),
+                      color: context.colorScheme.primary,
                     ),
                   ),
                 ],
@@ -583,10 +582,10 @@ class _AddOrderScreenState extends ConsumerState<AddOrderScreen> {
   Widget buildZone(BuildContext context, Zone zone, bool isSelected) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(32),
         border: Border.all(
-          color: const Color(0xFFF1F2F4),
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
           width: 1,
         ),
       ),
@@ -646,7 +645,9 @@ class _AddOrderScreenState extends ConsumerState<AddOrderScreen> {
                   ),
                   Text(
                     zone.governorate?.name ?? "لايوجد",
-                    style: const TextStyle(fontSize: 14, color: Colors.grey),
+                    style: TextStyle(
+                        fontSize: 14,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant),
                   ),
                 ],
               ),

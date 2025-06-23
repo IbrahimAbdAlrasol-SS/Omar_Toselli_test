@@ -72,6 +72,7 @@ class _ForgotPasswordNumberNamePassState
             children: [
               Expanded(
                 child: buildBackground(
+                  context: context,
                   child: Column(
                     crossAxisAlignment:
                         CrossAxisAlignment.start, // محاذاة النصوص لليمين

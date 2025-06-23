@@ -33,7 +33,6 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
     final orderAsync = ref.watch(getOrderByCodeProvider(widget.code));
 
     return Scaffold(
-      
       body: orderAsync.when(
         data: (order) => buildUi(context, order),
         error: (error, stack) => Center(child: Text(error.toString())),
@@ -246,7 +245,7 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                 Container(
                   padding: AppSpaces.allMedium,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(20),
                       topRight: Radius.circular(20),
@@ -334,7 +333,7 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                   width: 50,
                   height: 50,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.surface,
                     shape: BoxShape.circle,
                     border: Border.all(
                       color: Theme.of(context).colorScheme.outline,

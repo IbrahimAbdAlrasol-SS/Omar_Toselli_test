@@ -5,7 +5,6 @@ import 'package:Tosell/core/helpers/SharedPreferencesHelper.dart';
 import 'package:dio/dio.dart';
 import 'dart:developer' as developer;
 
-// const imageUrl = "http://192.168.1.55:5051/";
 const imageUrl = APIEndpoints.imageUrl;
 const baseUrl = APIEndpoints.baseUrl;
 

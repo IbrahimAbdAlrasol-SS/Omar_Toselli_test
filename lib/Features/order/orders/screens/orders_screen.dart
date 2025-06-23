@@ -148,7 +148,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
                       width: 50,
                       height: 50,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.surface,
                         shape: BoxShape.circle,
                         border: Border.all(
                           color: _currentFilter?.status == null
@@ -172,7 +172,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
         bottom: TabBar(
           controller: _tabController,
           labelColor: context.colorScheme.primary,
-          unselectedLabelColor: Colors.grey,
+          unselectedLabelColor: context.colorScheme.onSurfaceVariant,
           indicatorColor: context.colorScheme.primary,
           dividerColor: Colors.transparent,
           tabAlignment: TabAlignment.center,

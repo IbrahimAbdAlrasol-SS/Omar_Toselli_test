@@ -1,17 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-Widget buildBackground({Widget? child , double height= 360}) {
+Widget buildBackground(
+    {Widget? child, double height = 360, required BuildContext context}) {
   return Stack(
     children: [
       Container(
         width: double.infinity,
         height: height,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Color(0xFF16CA8B),
-              Color(0xFF109365),
+              Theme.of(context).colorScheme.primary,
+              Theme.of(context).colorScheme.primary.withOpacity(0.8),
             ],
             begin: Alignment.topCenter, // التدرج من الأعلى
             end: Alignment.bottomCenter, // إلى الأسفل
@@ -22,10 +23,12 @@ Widget buildBackground({Widget? child , double height= 360}) {
       buildCircle(
         top: -180,
         right: -180,
+        context: context,
       ),
       buildCircle(
         top: 200,
         left: -180,
+        context: context,
       ),
       if (child != null) child
     ],
@@ -37,9 +40,9 @@ Positioned buildCircle({
   double? left,
   double? right,
   double? top,
-  double? circleWidth=400,
-  double? circleHeight=320,
-
+  double? circleWidth = 400,
+  double? circleHeight = 320,
+  required BuildContext context,
   bool isFirstCircle = true, // إضافة معامل لتحديد اللون
 }) {
   return Positioned(
@@ -53,12 +56,9 @@ Positioned buildCircle({
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: isFirstCircle
-            ? const Color.fromARGB(24, 55, 38, 82)
-            : const Color.fromARGB(32, 110, 76, 61),
+            ? Theme.of(context).colorScheme.onPrimary.withOpacity(0.1)
+            : Theme.of(context).colorScheme.onPrimary.withOpacity(0.15),
       ),
     ),
   );
 }
-
-
-

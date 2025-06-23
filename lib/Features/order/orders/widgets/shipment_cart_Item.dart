@@ -32,7 +32,7 @@ class ShipmentCartItem extends ConsumerWidget {
           padding: const EdgeInsets.only(right: 2, left: 2, bottom: 2),
           decoration: BoxDecoration(
             border: Border.all(color: theme.colorScheme.outline),
-            color: const Color(0xffEAEEF0),
+            color: theme.colorScheme.surfaceContainerLow,
             borderRadius: BorderRadius.circular(24),
           ),
           child: Column(
@@ -85,7 +85,7 @@ class ShipmentCartItem extends ConsumerWidget {
                             ],
                           ),
                         ),
-                        _buildOrderStatus(shipment.status ?? 0),
+                        _buildOrderStatus(shipment.status ?? 0, theme),
                         const Gap(AppSpaces.small),
                       ],
                     ),
@@ -105,8 +105,7 @@ class ShipmentCartItem extends ConsumerWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           buildSection("وصولات/${shipment.ordersCount}",
-                              "assets/svg/48. Files.svg", theme,
-                              textColor: Colors.black),
+                              "assets/svg/48. Files.svg", theme),
                           //  buildSection(order.content ?? "لايوجد",
                           // "assets/svg/box.svg", theme),
                           VerticalDivider(
@@ -115,11 +114,8 @@ class ShipmentCartItem extends ConsumerWidget {
                             color: theme.colorScheme.outline,
                           ),
                           const Gap(AppSpaces.small),
-                          buildSection(
-                              "التجار/${shipment.merchantsCount}",
-                              "assets/svg/User.svg",
-                              theme,
-                              textColor: Colors.black),
+                          buildSection("التجار/${shipment.merchantsCount}",
+                              "assets/svg/User.svg", theme),
                         ],
                       ),
                     ),
@@ -133,17 +129,35 @@ class ShipmentCartItem extends ConsumerWidget {
     );
   }
 
-  Widget _buildOrderStatus(int index) {
+  Widget _buildOrderStatus(int index, ThemeData theme) {
+    // Check if current theme is dark
+    bool isDarkTheme = theme.brightness == Brightness.dark;
+
     return Container(
       width: 100,
       height: 26,
       decoration: BoxDecoration(
-        color: orderStatus[index].color,
+        color: orderStatus[index].getBackgroundColor(isDarkTheme),
         borderRadius: BorderRadius.circular(20),
+        border: isDarkTheme
+            ? Border.all(
+                color: orderStatus[index]
+                    .getTextColor(isDarkTheme, theme.colorScheme.onSurface)
+                    .withOpacity(0.3),
+                width: 1,
+              )
+            : null,
       ),
       child: Center(
         child: Text(
           orderStatus[index].name!,
+          style: TextStyle(
+            color: orderStatus[index]
+                .getTextColor(isDarkTheme, theme.colorScheme.onSurface),
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            fontFamily: "Tajawal",
+          ),
         ),
       ),
     );

@@ -63,7 +63,8 @@ class FillButton extends StatelessWidget {
                     style: TextStyle(
                         fontSize: fontSize ?? 16.0,
                         fontWeight: fontWeight ?? FontWeight.w500,
-                        color: textColor ?? Colors.white,
+                        color: textColor ??
+                            Theme.of(context).colorScheme.onPrimary,
                         height: 3.1),
                   ),
                   if (icon != null) const SizedBox(width: 8.0),

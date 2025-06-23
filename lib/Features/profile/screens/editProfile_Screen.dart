@@ -170,12 +170,14 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 _changeLoadingState(false);
                 if (result.$1 == null) {
                   GlobalToast.show(
+                    context: context,
                     message: result.$2 ?? "Unexpected error occurred",
                     backgroundColor: Theme.of(context).colorScheme.error,
                     textColor: Colors.white,
                   );
                 } else {
                   GlobalToast.show(
+                    context: context,
                     message: "تم تحديث المعلومات بنجاح",
                     backgroundColor: context.colorScheme.primary,
                     textColor: Colors.white,

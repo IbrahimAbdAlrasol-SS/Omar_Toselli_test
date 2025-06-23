@@ -29,7 +29,6 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
       backgroundColor: Colors.transparent,
       body: Column(
         children: [
-          
           const SafeArea(
             child: CustomAppBar(
               title: "حذف الحساب",
@@ -52,7 +51,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                     textAlign: TextAlign.right,
                   ),
                   const SizedBox(height: 20),
-                   Text(
+                  Text(
                     "سبب حذف الحساب",
                     style: context.textTheme.bodyMedium!.copyWith(
                       fontSize: 16,
@@ -60,13 +59,11 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  ...reasons
-                      .map((reason) => _buildCustomOption(reason, theme))
-                      ,
+                  ...reasons.map((reason) => _buildCustomOption(reason, theme)),
                   const SizedBox(height: 10),
                   _buildOtherReason(),
                   const SizedBox(height: 20),
-                   Text(
+                  Text(
                     "ملاحظة عند الحذف سيتم:",
                     style: context.textTheme.bodyMedium!.copyWith(
                       fontSize: 16,
@@ -144,16 +141,15 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
         Text(
           "سبب آخر",
           style: context.textTheme.bodyMedium!.copyWith(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-    
-          borderRadius: BorderRadius.circular(32),
-          color: context.colorScheme.surface,
+            borderRadius: BorderRadius.circular(32),
+            color: context.colorScheme.surface,
           ),
           child: TextField(
             controller: _otherReasonController,
@@ -178,9 +174,9 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
 
   Widget _buildDeleteButton(ColorScheme them) {
     return Container(
-      padding: const EdgeInsets.only(bottom: 25, left: 16,right: 16,top: 16),
+      padding: const EdgeInsets.only(bottom: 25, left: 16, right: 16, top: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         border: Border.all(
           color: Theme.of(context).colorScheme.outline,
         ),

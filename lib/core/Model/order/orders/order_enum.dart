@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 class OrderEnum {
   String? name;
   Color? textColor;
+  Color? darkTextColor;
   String? icon;
   Color? iconColor;
-
+  Color? darkIconColor;
   Color? color;
+  Color? darkColor;
   String? description;
   int? value;
 
@@ -14,11 +16,35 @@ class OrderEnum {
     this.name,
     this.icon,
     this.color,
+    this.darkColor,
     this.value,
     this.description,
     this.iconColor,
+    this.darkIconColor,
     this.textColor,
+    this.darkTextColor,
   });
+
+  // Helper methods to get colors based on theme
+  Color getBackgroundColor(bool isDark) {
+    return isDark
+        ? (darkColor ?? color ?? Colors.grey)
+        : (color ?? Colors.grey);
+  }
+
+  Color getTextColor(bool isDark, Color fallbackColor) {
+    if (isDark) {
+      return darkTextColor ?? textColor ?? fallbackColor;
+    }
+    return textColor ?? fallbackColor;
+  }
+
+  Color getIconColor(bool isDark, Color fallbackColor) {
+    if (isDark) {
+      return darkIconColor ?? iconColor ?? fallbackColor;
+    }
+    return iconColor ?? fallbackColor;
+  }
 }
 
 var orderStatus = [
@@ -26,7 +52,11 @@ var orderStatus = [
   OrderEnum(
       name: 'في الانتطار',
       color: const Color(0xFFE8FCF5),
+      darkColor: const Color(0xFF1A4A3A),
       iconColor: Colors.black,
+      darkIconColor: const Color(0xFF16CA8B),
+      textColor: const Color(0xFF16CA8B),
+      darkTextColor: const Color(0xFF16CA8B),
       icon: 'assets/svg/box.svg',
       description: 'طلبك قيد انتظار الموافقة',
       value: 0),
@@ -34,8 +64,11 @@ var orderStatus = [
   OrderEnum(
       name: 'قائمة استحصال',
       color: const Color(0xFFE5F6FF),
+      darkColor: const Color(0xFF1A3A4A),
       iconColor: Colors.black,
+      darkIconColor: const Color(0xFF3B82F6),
       textColor: Colors.black,
+      darkTextColor: const Color(0xFF3B82F6),
       icon: 'assets/svg/box.svg',
       description: 'في قائمة الاستحصال',
       value: 1),
@@ -43,8 +76,11 @@ var orderStatus = [
   OrderEnum(
       name: 'قيد الاستحصال',
       color: const Color(0xFFE8FCF5),
+      darkColor: const Color(0xFF1A4A3A),
       iconColor: Colors.black,
+      darkIconColor: const Color(0xFF16CA8B),
       textColor: Colors.black,
+      darkTextColor: const Color(0xFF16CA8B),
       icon: 'assets/svg/box.svg',
       description: ' طلبك قيد الاستحصال من قبل المندوب',
       value: 2),
@@ -52,8 +88,11 @@ var orderStatus = [
   OrderEnum(
       name: 'في نقطة الاستحصال',
       color: const Color(0xFFE8FCF5),
+      darkColor: const Color(0xFF1A4A3A),
       iconColor: Colors.black,
+      darkIconColor: const Color(0xFF16CA8B),
       textColor: Colors.black,
+      darkTextColor: const Color(0xFF16CA8B),
       icon: 'assets/svg/box.svg',
       description: 'الطلب في نقطة الاستحصال',
       value: 3),
@@ -61,53 +100,71 @@ var orderStatus = [
   OrderEnum(
       name: 'تم الاستحصال',
       color: const Color(0xFFE8FCF5),
+      darkColor: const Color(0xFF1A4A3A),
       iconColor: Colors.black,
+      darkIconColor: const Color(0xFF16CA8B),
       textColor: Colors.black,
+      darkTextColor: const Color(0xFF16CA8B),
       icon: 'assets/svg/box.svg',
       description: 'تم استحصال الطلب من قبل المندوب',
       value: 4),
   //? index = 5 - NotReceived
   OrderEnum(
       name: 'غير مستحصل',
-      color: const Color(0xFFE8FCF5),
-      iconColor: Colors.black,
-      textColor: Colors.black,
+      color: const Color(0xFFFFF3E0),
+      darkColor: const Color(0xFF4A3A1A),
+      iconColor: Colors.orange,
+      darkIconColor: const Color(0xFFF59E0B),
+      textColor: Colors.orange,
+      darkTextColor: const Color(0xFFF59E0B),
       icon: 'assets/svg/box.svg',
       description: 'لم يتم استحصال الطلب من قبل المندوب',
       value: 5),
-  //? index = 6 - InWarehouse
+  //? index = 6 - OnTheWay
   OrderEnum(
-      name: 'في المخزن',
+      name: 'في الطريق',
       color: const Color(0xFFE8FCF5),
+      darkColor: const Color(0xFF1A4A3A),
       iconColor: Colors.black,
+      darkIconColor: const Color(0xFF16CA8B),
       textColor: Colors.black,
+      darkTextColor: const Color(0xFF16CA8B),
       icon: 'assets/svg/box.svg',
-      description: 'تم وصول الطلب الى المخزن',
+      description: 'الطلب في الطريق إليك',
       value: 6),
-  //? index = 7 - InDeliveryShipment
+  //? index = 7 - Delivered
   OrderEnum(
-      name: 'في شحنة التوصيل',
+      name: 'تم التوصيل',
       color: const Color(0xFFE8FCF5),
+      darkColor: const Color(0xFF1A4A3A),
       iconColor: Colors.black,
+      darkIconColor: const Color(0xFF16CA8B),
       textColor: Colors.black,
+      darkTextColor: const Color(0xFF16CA8B),
       icon: 'assets/svg/box.svg',
-      description: 'الطلب في شحنة التوصيل',
+      description: 'تم توصيل الطلب بنجاح',
       value: 7),
-  //? index = 8 - InDeliveryProgress
+  //? index = 8 - NotDelivered
   OrderEnum(
-      name: 'قيد التوصيل',
-      color: const Color(0xFFE8FCF5),
-      iconColor: Colors.black,
-      textColor: Colors.black,
+      name: 'غير موصل',
+      color: const Color(0xFFFFF3E0),
+      darkColor: const Color(0xFF4A3A1A),
+      iconColor: Colors.orange,
+      darkIconColor: const Color(0xFFF59E0B),
+      textColor: Colors.orange,
+      darkTextColor: const Color(0xFFF59E0B),
       icon: 'assets/svg/box.svg',
-      description: 'طلبك قيد التوصيل للزبون',
+      description: 'لم يتم توصيل الطلب',
       value: 8),
   //? index = 9 - AtDeliveryPoint
   OrderEnum(
       name: 'في نقطة التوصيل',
       color: const Color(0xFFE8FCF5),
+      darkColor: const Color(0xFF1A4A3A),
       iconColor: Colors.black,
+      darkIconColor: const Color(0xFF16CA8B),
       textColor: Colors.black,
+      darkTextColor: const Color(0xFF16CA8B),
       icon: 'assets/svg/box.svg',
       description: 'الطلب في نقطة التوصيل',
       value: 9),
@@ -115,46 +172,61 @@ var orderStatus = [
   OrderEnum(
       name: 'تم التوصيل',
       color: const Color(0xFFE8FCF5),
+      darkColor: const Color(0xFF1A4A3A),
       iconColor: Colors.black,
+      darkIconColor: const Color(0xFF16CA8B),
       textColor: Colors.black,
+      darkTextColor: const Color(0xFF16CA8B),
       icon: 'assets/svg/box.svg',
-      description: 'تم ايصال الطلب للزبون',
+      description: 'تم توصيل الطلب بنجاح',
       value: 10),
-  //? index = 11 - PartiallyDelivered
+  //? index = 11 - NotDelivered
   OrderEnum(
-      name: 'توصيل جزئي',
-      color: const Color(0xFFE8FCF5),
-      iconColor: Colors.black,
-      textColor: Colors.black,
+      name: 'غير موصل',
+      color: const Color(0xFFFFF3E0),
+      darkColor: const Color(0xFF4A3A1A),
+      iconColor: Colors.orange,
+      darkIconColor: const Color(0xFFF59E0B),
+      textColor: Colors.orange,
+      darkTextColor: const Color(0xFFF59E0B),
       icon: 'assets/svg/box.svg',
-      description: 'تم الايصال الجزئي للزبون',
+      description: 'لم يتم توصيل الطلب',
       value: 11),
   //? index = 12 - Cancelled
   OrderEnum(
       name: 'ملغي',
-      color: const Color(0xFFE8FCF5),
-      iconColor: Colors.black,
-      textColor: Colors.black,
+      color: const Color(0xFFF3E5F5),
+      darkColor: const Color(0xFF4A1A4A),
+      iconColor: Colors.purple,
+      darkIconColor: const Color(0xFFA855F7),
+      textColor: Colors.purple,
+      darkTextColor: const Color(0xFFA855F7),
       icon: 'assets/svg/box.svg',
-      description: 'تم الغاء الطلب',
+      description: 'تم إلغاء الطلب',
       value: 12),
-  //? index = 13 - Completed
+  //? index = 13 - Rescheduled
   OrderEnum(
-      name: 'مكتمل',
-      color: const Color(0xFFE8FCF5),
-      iconColor: Colors.black,
-      textColor: Colors.black,
-      icon: 'assets/svg/box.svg',
-      description: 'تم اكتمال الطلب',
-      value: 13),
-  //? index = 14 - RescheduledInWarehouse
-  OrderEnum(
-      name: 'مؤجل في المستودع',
+      name: 'مؤجل',
       color: const Color(0xFFFFF3E0),
+      darkColor: const Color(0xFF4A3A1A),
       iconColor: Colors.orange,
+      darkIconColor: const Color(0xFFF59E0B),
       textColor: Colors.orange,
+      darkTextColor: const Color(0xFFF59E0B),
       icon: 'assets/svg/box.svg',
-      description: 'تم تأجيل الطلب في المستودع',
+      description: 'تم تأجيل الطلب',
+      value: 13),
+  //? index = 14 - Refunded
+  OrderEnum(
+      name: 'مسترجع',
+      color: const Color(0xFFF3E5F5),
+      darkColor: const Color(0xFF4A1A4A),
+      iconColor: Colors.purple,
+      darkIconColor: const Color(0xFFA855F7),
+      textColor: Colors.purple,
+      darkTextColor: const Color(0xFFA855F7),
+      icon: 'assets/svg/box.svg',
+      description: 'تم استرجاع الطلب',
       value: 14),
   //? index = 15 - RescheduledDelegate
   OrderEnum(

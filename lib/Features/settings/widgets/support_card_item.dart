@@ -17,12 +17,16 @@ class SupportCardItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final status = SupportStatus.values[support.statusIndex % SupportStatus.values.length];
+    final status =
+        SupportStatus.values[support.statusIndex % SupportStatus.values.length];
+    final theme = Theme.of(context);
+    final isDarkTheme = theme.brightness == Brightness.dark;
 
     return Container(
       key: ValueKey(support.id),
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       child: Material(
+        color: theme.colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(20),
         elevation: 1,
         clipBehavior: Clip.antiAlias,
@@ -43,12 +47,12 @@ class SupportCardItem extends StatelessWidget {
                         children: [
                           CircleAvatar(
                             radius: 20,
-                            backgroundColor: Colors.white,
+                            backgroundColor: theme.colorScheme.surface,
                             child: SvgPicture.asset(
                               'assets/svg/support.svg',
                               width: 24,
                               height: 24,
-                              color: const Color(0xff16CA8B),
+                              color: theme.colorScheme.primary,
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -58,16 +62,17 @@ class SupportCardItem extends StatelessWidget {
                               children: [
                                 Text(
                                   support.id,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
+                                    color: theme.colorScheme.onSurface,
                                   ),
                                 ),
                                 Text(
                                   support.time,
                                   style: TextStyle(
                                     fontSize: 14,
-                                    color: Colors.grey[600],
+                                    color: theme.colorScheme.secondary,
                                   ),
                                 ),
                               ],
@@ -76,20 +81,29 @@ class SupportCardItem extends StatelessWidget {
                         ],
                       ),
                     ),
-                    
+
                     // Status Badge
                     Container(
                       constraints: const BoxConstraints(minWidth: 80),
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 4),
                       decoration: BoxDecoration(
-                        color: status.color,
+                        color: status.getBackgroundColor(isDarkTheme),
                         borderRadius: BorderRadius.circular(20),
+                        border: isDarkTheme
+                            ? Border.all(
+                                color: status
+                                    .getTextColor(isDarkTheme)
+                                    .withOpacity(0.3),
+                                width: 1,
+                              )
+                            : null,
                       ),
                       child: Center(
                         child: Text(
                           status.name,
                           style: TextStyle(
-                            color: status.textColor,
+                            color: status.getTextColor(isDarkTheme),
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
                           ),
@@ -98,17 +112,19 @@ class SupportCardItem extends StatelessWidget {
                     ),
                   ],
                 ),
-                
+
                 // Description
                 Padding(
                   padding: const EdgeInsets.only(top: 12),
                   child: Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 10),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: theme.colorScheme.surface,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xffEAEEF0), width: 1),
+                      border: Border.all(
+                          color: theme.colorScheme.outline, width: 1),
                     ),
                     child: Row(
                       children: [
@@ -122,9 +138,10 @@ class SupportCardItem extends StatelessWidget {
                         Expanded(
                           child: Text(
                             support.description,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w500,
+                              color: theme.colorScheme.onSurface,
                             ),
                             maxLines: isExpanded ? null : 1,
                             overflow: isExpanded ? null : TextOverflow.ellipsis,

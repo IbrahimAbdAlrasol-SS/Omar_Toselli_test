@@ -9,7 +9,7 @@ class CustomSection extends StatefulWidget {
   final BorderRadius? childrenRadius;
   final BorderRadius? borderRadius;
   final bool noLine;
-  
+
   const CustomSection({
     super.key,
     this.children,
@@ -36,7 +36,7 @@ class _CustomSectionState extends State<CustomSection> {
         padding: const EdgeInsets.only(right: 2, left: 2, bottom: 2),
         decoration: BoxDecoration(
           border: Border.all(color: theme.colorScheme.outline),
-          color:Color(0xffF9FAFB),
+          color: theme.colorScheme.surfaceContainerLow,
           borderRadius: widget.borderRadius ?? BorderRadius.circular(24),
         ),
         child: Column(
@@ -96,7 +96,8 @@ class _CustomSectionState extends State<CustomSection> {
                                   ),
                                   child: e.value,
                                 ),
-                                if (e.key != widget.children!.length - 1 && !widget.noLine)
+                                if (e.key != widget.children!.length - 1 &&
+                                    !widget.noLine)
                                   Divider(
                                     height: 1,
                                     color: theme.colorScheme.outline,

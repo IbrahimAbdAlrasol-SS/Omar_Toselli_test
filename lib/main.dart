@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'core/theme/app_theme.dart';
+import 'core/theme/ThemeNotifier.dart';
 import 'package:flutter/material.dart';
 import 'package:Tosell/core/router/app_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,7 +8,6 @@ import 'package:Tosell/core/helpers/HttpOverrides.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:Tosell/core/helpers/SharedPreferencesHelper.dart';
-
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,19 +41,18 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // final themeMode = ref.watch(themeProvider);
+    final themeMode = ref.watch(themeNotifierProvider);
 
     return MaterialApp.router(
       title: 'Flutter Riverpod App',
-
       routerConfig: appRouter,
       theme: AppTheme.lightTheme,
-      debugShowCheckedModeBanner: false,
       darkTheme: AppTheme.darkTheme,
-      // themeMode: themeMode,
+      themeMode: themeMode,
+      debugShowCheckedModeBanner: false,
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
-      locale: context.locale, // Let EasyLocalization handle this
+      locale: context.locale,
     );
   }
 }

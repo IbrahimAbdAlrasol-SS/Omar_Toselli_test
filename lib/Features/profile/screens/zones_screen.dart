@@ -90,7 +90,7 @@ class _ZonesScreenState extends ConsumerState<ZonesScreen> {
       bottomNavigationBar: Container(
         padding: AppSpaces.allMedium,
         decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.surface,
             border: Border.all(
               color: Theme.of(context).colorScheme.outline,
             ),
@@ -101,7 +101,7 @@ class _ZonesScreenState extends ConsumerState<ZonesScreen> {
             color: context.colorScheme.primary,
             icon: SvgPicture.asset(
               "assets/svg/navigation_add.svg",
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onPrimary,
             ),
             reverse: true,
             label: "إضافة عنوان جديد",
@@ -138,12 +138,15 @@ class _ZonesScreenState extends ConsumerState<ZonesScreen> {
   Widget buildZoneCart(Zone zone, ThemeData theme) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(32),
         border: Border.all(
-          color: const Color(0xFFF1F2F4), // specify the border color
+          color: Theme.of(context)
+              .colorScheme
+              .outline
+              .withOpacity(0.3), // specify the border color
           width: 1,
         ),
       ),
@@ -154,8 +157,8 @@ class _ZonesScreenState extends ConsumerState<ZonesScreen> {
             //? Location Icon
             child: Container(
               padding: const EdgeInsets.all(8),
-              decoration: const BoxDecoration(
-                color: Color(0xFFEDE7F6),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primaryContainer,
                 shape: BoxShape.circle,
               ),
               child: SvgPicture.asset(
@@ -170,12 +173,15 @@ class _ZonesScreenState extends ConsumerState<ZonesScreen> {
               children: [
                 Text(
                   zone.name ?? 'لايوجد',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   zone.governorate?.name ?? 'لايوجد',
-                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                  style: TextStyle(
+                      fontSize: 14,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
               ],
             ),
@@ -184,7 +190,7 @@ class _ZonesScreenState extends ConsumerState<ZonesScreen> {
           IconButton(
             icon: SvgPicture.asset(
               "assets/svg/pin.svg",
-              color: const Color(0xFFFFE500),
+              color: Theme.of(context).colorScheme.tertiary,
             ),
             onPressed: () {
               showModalBottomSheet(
@@ -205,11 +211,9 @@ class _ZonesScreenState extends ConsumerState<ZonesScreen> {
           IconButton(
             icon: SvgPicture.asset(
               "assets/svg/49. TrashSimple.svg",
-              color: const Color(0xffE96363),
+              color: Theme.of(context).colorScheme.error,
             ),
-            onPressed: () {
-              
-            },
+            onPressed: () {},
           ),
         ],
       ),

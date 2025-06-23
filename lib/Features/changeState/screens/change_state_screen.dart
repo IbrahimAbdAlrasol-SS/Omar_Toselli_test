@@ -307,12 +307,15 @@ class _ChangeStateScreenState extends ConsumerState<ChangeStateScreen> {
 
                             if (result == null) {
                               GlobalToast.show(
+                                context: context,
                                 message: error!,
                                 backgroundColor: context.colorScheme.error,
                                 textColor: Colors.white,
                               );
                             } else {
                               GlobalToast.show(
+                                context: context,
+
                                 message: 'تمت العملية بنجاح',
                                 backgroundColor: context.colorScheme.primary,
                                 textColor: Colors.white,

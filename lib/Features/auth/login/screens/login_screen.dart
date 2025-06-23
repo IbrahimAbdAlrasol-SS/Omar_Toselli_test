@@ -80,19 +80,23 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               children: [
                 Expanded(
                   child: buildBackground(
+                    context: context,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Gap(25),
                         CustomAppBar(
                           // title: "إنشاء حساب",
-                          titleWidget: Text('إنشاء حساب', style: context.textTheme.bodyMedium!.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                            fontSize: 16
-                          ),) ,
+                          titleWidget: Text(
+                            'إنشاء حساب',
+                            style: context.textTheme.bodyMedium!.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                                fontSize: 16),
+                          ),
                           showBackButton: true,
-                          onBackButtonPressed: () =>context.push(AppRoutes.registerScreen),
+                          onBackButtonPressed: () =>
+                              context.push(AppRoutes.registerScreen),
                         ),
                         Padding(
                           padding: const EdgeInsets.only(right: 20),
@@ -241,6 +245,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
                                   if (result.$1 == null) {
                                     GlobalToast.show(
+                                      context: context,
                                       message: result.$2!,
                                       backgroundColor:
                                           Theme.of(context).colorScheme.error,
@@ -248,17 +253,19 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                     );
                                   } else {
                                     // التحقق من حالة انتظار التفعيل
-                                    if (result.$2 == "ACCOUNT_PENDING_ACTIVATION") {
+                                    if (result.$2 ==
+                                        "ACCOUNT_PENDING_ACTIVATION") {
                                       GlobalToast.show(
+                                        context: context,
                                         message: "حسابك في انتظار التفعيل",
-                                        backgroundColor:
-                                            Colors.orange,
+                                        backgroundColor: Colors.orange,
                                         textColor: Colors.white,
                                       );
                                       // الانتقال إلى شاشة انتظار التفعيل
                                       context.go('/pending-activation');
                                     } else {
                                       GlobalToast.show(
+                                        context: context,
                                         message: "تم تسجيل الدخول بنجاح",
                                         backgroundColor:
                                             context.colorScheme.primary,

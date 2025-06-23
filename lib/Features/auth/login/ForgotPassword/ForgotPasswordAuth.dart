@@ -114,6 +114,7 @@ class _ForgotpasswordAuthState extends ConsumerState<ForgotpasswordAuth> {
             children: [
               Expanded(
                 child: buildBackground(
+                  context: context,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

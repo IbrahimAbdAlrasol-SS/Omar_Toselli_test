@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 class GlobalToast {
   static void show({
     required String message,
+    required BuildContext context,
     ToastGravity gravity = ToastGravity.BOTTOM,
-    Color backgroundColor = Colors.black87,
-    Color textColor = Colors.white,
+    Color? backgroundColor,
+    Color? textColor,
     double fontSize = 16.0,
     int durationInSeconds = 2,
   }) {
@@ -14,8 +15,9 @@ class GlobalToast {
       msg: message,
       toastLength: Toast.LENGTH_SHORT,
       gravity: gravity,
-      backgroundColor: backgroundColor,
-      textColor: textColor,
+      backgroundColor:
+          backgroundColor ?? Theme.of(context).colorScheme.inverseSurface,
+      textColor: textColor ?? Theme.of(context).colorScheme.onInverseSurface,
       fontSize: fontSize,
       timeInSecForIosWeb: durationInSeconds,
     );
@@ -23,17 +25,19 @@ class GlobalToast {
 
   static void showSuccess({
     required String message,
+    required BuildContext context,
     ToastGravity gravity = ToastGravity.BOTTOM,
-    Color backgroundColor = Colors.green,
-    Color textColor = Colors.white,
+    Color? backgroundColor,
+    Color? textColor,
     double fontSize = 16.0,
     int durationInSeconds = 2,
   }) {
     show(
       message: message,
+      context: context,
       gravity: gravity,
-      backgroundColor: backgroundColor,
-      textColor: textColor,
+      backgroundColor: backgroundColor ?? Theme.of(context).colorScheme.primary,
+      textColor: textColor ?? Theme.of(context).colorScheme.onPrimary,
       fontSize: fontSize,
       durationInSeconds: durationInSeconds,
     );

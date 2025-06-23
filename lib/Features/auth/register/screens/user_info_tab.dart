@@ -116,7 +116,10 @@ class _UserInfoTabState extends ConsumerState<UserInfoTab> {
             _isUploadingImage = false;
           });
 
-          GlobalToast.showSuccess(message: 'تم رفع الصورة بنجاح');
+          GlobalToast.showSuccess(
+            context: context,
+            message: 'تم رفع الصورة بنجاح',
+          );
 
           _saveCurrentData();
         } else {
@@ -130,6 +133,7 @@ class _UserInfoTabState extends ConsumerState<UserInfoTab> {
       });
 
       GlobalToast.show(
+        context: context,
         message: 'فشل في رفع الصورة: ${e.toString()}',
         backgroundColor: Colors.red,
       );
@@ -152,6 +156,7 @@ class _UserInfoTabState extends ConsumerState<UserInfoTab> {
     if (!_formKey.currentState!.validate()) return;
     if (_uploadedImageUrl == null) {
       GlobalToast.show(
+        context: context,
         message: 'يجب رفع صورة المتجر أولاً',
         backgroundColor: Colors.red,
       );
@@ -159,6 +164,7 @@ class _UserInfoTabState extends ConsumerState<UserInfoTab> {
     }
     if (_passwordController.text != _confirmPasswordController.text) {
       GlobalToast.show(
+        context: context,
         message: 'كلمة المرور غير متطابقة',
         backgroundColor: Colors.red,
       );

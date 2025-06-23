@@ -33,7 +33,7 @@ class _LogoutScreenState extends State<LogoutScreen> {
               width: 140,
               height: 3,
               decoration: BoxDecoration(
-                color: const Color(0xFFD4D7DD),
+                color: Theme.of(context).colorScheme.outline,
                 borderRadius: BorderRadius.circular(100),
               ),
             ),
@@ -59,7 +59,7 @@ class _LogoutScreenState extends State<LogoutScreen> {
                               .textTheme
                               .titleMedium!
                               .copyWith(
-                                  color: const Color(0xffE96363),
+                                  color: Theme.of(context).colorScheme.error,
                                   fontWeight: FontWeight.w600,
                                   fontSize: 24),
                         ),
@@ -70,7 +70,8 @@ class _LogoutScreenState extends State<LogoutScreen> {
                               .textTheme
                               .titleSmall!
                               .copyWith(
-                                  color: const Color(0xff698596),
+                                  color:
+                                      Theme.of(context).colorScheme.secondary,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500),
                         ),
@@ -85,7 +86,7 @@ class _LogoutScreenState extends State<LogoutScreen> {
               padding: AppSpaces.allMedium,
               child: SafeArea(
                 child: FillButton(
-                  color: const Color(0xffE96363),
+                  color: Theme.of(context).colorScheme.error,
                   label: "تسجيل الخروج",
                   onPressed: () {
                     SharedPreferencesHelper.removeUser();

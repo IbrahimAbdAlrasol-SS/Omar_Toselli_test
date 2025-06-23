@@ -122,6 +122,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
 
                   if (result.$2 != null) {
                     GlobalToast.show(
+                      context: context,
                       message: result.$2!,
                       backgroundColor: Theme.of(context).colorScheme.error,
                       textColor: Colors.white,
@@ -129,6 +130,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                     _setLoadingState(false);
                   } else {
                     GlobalToast.show(
+                      context: context,
                       message: "تم تحديث المعلومات بنجاح",
                       backgroundColor: context.colorScheme.primary,
                       textColor: Colors.white,

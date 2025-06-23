@@ -7,7 +7,7 @@ part of 'order_commands_provider.dart';
 // **************************************************************************
 
 String _$orderCommandsNotifierHash() =>
-    r'22f134239c6cea58ba4c9aa22a0241452ec08fd4';
+    r'ece6a5ee575274f8bd6401c0211bb2e2342a1f18';
 
 /// See also [OrderCommandsNotifier].
 @ProviderFor(OrderCommandsNotifier)

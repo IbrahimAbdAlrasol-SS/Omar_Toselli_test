@@ -159,12 +159,16 @@ Widget buildCart(BuildContext context,
                       width: 100,
                       height: 26,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFE8FCF5),
+                        color: Theme.of(context).colorScheme.primaryContainer,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Center(
                         child: Text(
                           state,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onPrimaryContainer,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                     ),

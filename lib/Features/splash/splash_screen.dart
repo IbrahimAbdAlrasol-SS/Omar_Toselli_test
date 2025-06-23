@@ -63,9 +63,9 @@ class _SplashScreenState extends State<SplashScreen>
     return Container(
       height: height,
       width: width,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Color.fromARGB(24, 55, 38, 82),
+        color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.1),
       ),
     );
   }
@@ -75,16 +75,19 @@ class _SplashScreenState extends State<SplashScreen>
     Size size = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: Stack(
         children: [
           // Gradient background
           Container(
             width: double.infinity,
             height: double.infinity,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF16CA8B), Color(0xFF109365)],
+                colors: [
+                  Theme.of(context).colorScheme.primary,
+                  Theme.of(context).colorScheme.primary.withOpacity(0.8)
+                ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),

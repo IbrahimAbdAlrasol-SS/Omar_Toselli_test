@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:Tosell/core/constants/spaces.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-
 class OrderCardItem extends ConsumerWidget {
   final Order order;
   final Function? onTap;
@@ -26,8 +25,9 @@ class OrderCardItem extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var theme = Theme.of(context);
-    DateTime date = DateTime.parse(order.creationDate ?? DateTime.now().toString());
-    
+    DateTime date =
+        DateTime.parse(order.creationDate ?? DateTime.now().toString());
+
     final canSelect = order.id != null && order.status != null;
 
     return GestureDetector(
@@ -41,26 +41,29 @@ class OrderCardItem extends ConsumerWidget {
       onLongPress: canSelect ? onSelectionToggle : null,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 2), // Reduce spacing
+        margin: const EdgeInsets.symmetric(
+            horizontal: 16, vertical: 2), // Reduce spacing
         padding: const EdgeInsets.only(right: 2, left: 2, bottom: 2),
         decoration: BoxDecoration(
           border: Border.all(
-            color: isMultiSelectMode && isSelected 
+            color: isMultiSelectMode && isSelected
                 ? theme.colorScheme.primary
                 : theme.colorScheme.outline,
             width: isMultiSelectMode && isSelected ? 2 : 1,
           ),
-          color: isMultiSelectMode && isSelected 
+          color: isMultiSelectMode && isSelected
               ? theme.colorScheme.primary.withOpacity(0.1)
-              : const Color(0xffEAEEF0),
+              : theme.colorScheme.surfaceContainerLow,
           borderRadius: BorderRadius.circular(24),
-          boxShadow: isMultiSelectMode && isSelected ? [
-            BoxShadow(
-              color: theme.colorScheme.primary.withOpacity(0.2),
-              blurRadius: 8,
-              spreadRadius: 2,
-            )
-          ] : null,
+          boxShadow: isMultiSelectMode && isSelected
+              ? [
+                  BoxShadow(
+                    color: theme.colorScheme.primary.withOpacity(0.2),
+                    blurRadius: 8,
+                    spreadRadius: 2,
+                  )
+                ]
+              : null,
         ),
         child: Stack(
           children: [
@@ -115,7 +118,7 @@ class OrderCardItem extends ConsumerWidget {
                               ],
                             ),
                           ),
-                          _buildOrderStatus(order.status ?? 0),
+                          _buildOrderStatus(order.status ?? 0, theme),
                           const Gap(AppSpaces.small),
                         ],
                       ),
@@ -179,7 +182,7 @@ class OrderCardItem extends ConsumerWidget {
                 ),
               ],
             ),
-            
+
             // Multi-select checkbox
             if (isMultiSelectMode)
               Positioned(
@@ -191,11 +194,11 @@ class OrderCardItem extends ConsumerWidget {
                   height: 28,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: isSelected 
+                    color: isSelected
                         ? theme.colorScheme.primary
-                        : Colors.white,
+                        : theme.colorScheme.surface,
                     border: Border.all(
-                      color: isSelected 
+                      color: isSelected
                           ? theme.colorScheme.primary
                           : canSelect
                               ? theme.colorScheme.outline
@@ -204,14 +207,15 @@ class OrderCardItem extends ConsumerWidget {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: theme.colorScheme.shadow.withOpacity(0.1),
                         blurRadius: 4,
                         spreadRadius: 1,
                       )
                     ],
                   ),
                   child: isSelected
-                      ? const Icon(Icons.check, size: 18, color: Colors.white)
+                      ? Icon(Icons.check,
+                          size: 18, color: theme.colorScheme.onPrimary)
                       : canSelect
                           ? null
                           : Icon(
@@ -221,13 +225,13 @@ class OrderCardItem extends ConsumerWidget {
                             ),
                 ),
               ),
-              
+
             // Non-selectable overlay
             if (isMultiSelectMode && !canSelect)
               Positioned.fill(
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.grey.withOpacity(0.3),
+                    color: theme.colorScheme.outline.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(24),
                   ),
                 ),
@@ -238,30 +242,44 @@ class OrderCardItem extends ConsumerWidget {
     );
   }
 
-  Widget _buildOrderStatus(int index) {
+  Widget _buildOrderStatus(int index, ThemeData theme) {
     // Ensure index is within bounds
     int statusIndex = index;
     if (statusIndex < 0 || statusIndex >= orderStatus.length) {
       statusIndex = 0; // Use default status
     }
-    
+
+    // Check if current theme is dark
+    bool isDarkTheme = theme.brightness == Brightness.dark;
+
     // Debug print for status
-    print('Order status index: $index, using statusIndex: $statusIndex, status name: ${orderStatus[statusIndex].name}');
-    
+    print(
+        'Order status index: $index, using statusIndex: $statusIndex, status name: ${orderStatus[statusIndex].name}, isDark: $isDarkTheme');
+
     return Container(
       width: 100,
       height: 26,
       decoration: BoxDecoration(
-        color: orderStatus[statusIndex].color,
+        color: orderStatus[statusIndex].getBackgroundColor(isDarkTheme),
         borderRadius: BorderRadius.circular(20),
+        border: isDarkTheme
+            ? Border.all(
+                color: orderStatus[statusIndex]
+                    .getTextColor(isDarkTheme, theme.colorScheme.onSurface)
+                    .withOpacity(0.3),
+                width: 1,
+              )
+            : null,
       ),
       child: Center(
         child: Text(
           orderStatus[statusIndex].name!,
           style: TextStyle(
-            color: orderStatus[statusIndex].textColor ?? Colors.black,
+            color: orderStatus[statusIndex]
+                .getTextColor(isDarkTheme, theme.colorScheme.onSurface),
             fontSize: 12,
             fontWeight: FontWeight.w500,
+            fontFamily: "Tajawal",
           ),
         ),
       ),

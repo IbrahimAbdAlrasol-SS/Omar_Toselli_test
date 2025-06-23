@@ -19,19 +19,19 @@ class OrderCartHeader extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         border: Border.all(color: Theme.of(context).colorScheme.outline),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
         children: [
           Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(14),
                 topRight: Radius.circular(14),
               ),
-              color: Color(0xFFEAEEF0),
+              color: Theme.of(context).colorScheme.surfaceContainerLow,
             ),
             padding: AppSpaces.allSmall,
             child: Row(

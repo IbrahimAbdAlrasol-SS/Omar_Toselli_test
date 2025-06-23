@@ -32,6 +32,7 @@ import 'package:Tosell/Features/auth/login/ForgotPassword/ForgotPasswordAuth.dar
 import 'package:Tosell/Features/auth/login/ForgotPassword/ForgotPasswordNumber.dart';
 import 'package:Tosell/Features/auth/login/ForgotPassword/ForgotPasswordNumberNamePass.dart';
 import 'package:Tosell/Features/auth/register/screens/map_selection_screen.dart'; // ✅ Add import
+import 'package:Tosell/Features/settings/screens/theme_settings_screen.dart';
 
 String initialLocation = AppRoutes.login;
 
@@ -132,7 +133,6 @@ final GoRouter appRouter = GoRouter(
       ),
     ),
 
-    
     GoRoute(
       path: AppRoutes.registerScreen,
       builder: (context, state) =>
@@ -238,6 +238,12 @@ final GoRouter appRouter = GoRouter(
         ),
       ],
     ),
+    GoRoute(
+      path: AppRoutes.themeSettings,
+      builder: (context, state) => const BackgroundWrapper(
+        child: ThemeSettingsScreen(),
+      ),
+    ),
   ],
 );
 
@@ -302,4 +308,5 @@ class AppRoutes {
       '/ForgotPasswordNumberNamePass';
   static const String shipmentOrders = '/shipment-orders';
   static const String pendingActivation = '/pending-activation';
+  static const String themeSettings = '/theme-settings';
 }

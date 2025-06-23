@@ -71,7 +71,7 @@ class CustomTextFormField<T> extends StatelessWidget {
                 Theme.of(context)
                     .textTheme
                     .bodyLarge!
-                    .copyWith(color: Colors.black),
+                    .copyWith(color: Theme.of(context).colorScheme.onSurface),
           ),
         if (showLabel!) const Gap(AppSpaces.small),
         Row(
@@ -84,10 +84,12 @@ class CustomTextFormField<T> extends StatelessWidget {
                       items: dropdownItems,
                       onChanged: onDropdownChanged,
                       decoration: InputDecoration(
-                        fillColor: Colors.white,
+                        fillColor: Theme.of(context).colorScheme.surface,
                         filled: true,
                         hintText: hint ?? '',
-                        hintStyle: const TextStyle(color: Color(0xFF698596)),
+                        hintStyle: TextStyle(
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant),
                         border: OutlineInputBorder(
                           borderRadius: borderRadius,
                           borderSide: BorderSide(color: outlineColor),
@@ -132,9 +134,11 @@ class CustomTextFormField<T> extends StatelessWidget {
                       },
                       validator: validator,
                       decoration: InputDecoration(
-                        fillColor: Colors.white,
+                        fillColor: Theme.of(context).colorScheme.surface,
                         filled: true,
-                        hintStyle: TextStyle(color: Theme.of(context).colorScheme.primary),
+                        hintStyle: TextStyle(
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant),
                         hintText: hint ?? '',
                         border: OutlineInputBorder(
                           borderRadius: borderRadius,

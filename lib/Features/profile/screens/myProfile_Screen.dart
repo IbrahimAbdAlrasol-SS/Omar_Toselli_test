@@ -140,6 +140,13 @@ class _MyProfileScreenState extends ConsumerState<MyProfileScreen> {
                         onTap: () =>
                             GoRouter.of(context).push(AppRoutes.notifications),
                       ),
+                      buildSection(
+                        "إعدادات المظهر",
+                        "assets/svg/theme.svg",
+                        theme,
+                        onTap: () =>
+                            GoRouter.of(context).push(AppRoutes.themeSettings),
+                      ),
                       // buildSection(
                       //   "اللغة",
                       //   "assets/svg/language.svg",
@@ -243,7 +250,7 @@ class _MyProfileScreenState extends ConsumerState<MyProfileScreen> {
         height: 1,
         width: size.width * 0.93,
         child: Container(
-          color: const Color(0x0ff1f2f4),
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
         ),
       ),
     );
