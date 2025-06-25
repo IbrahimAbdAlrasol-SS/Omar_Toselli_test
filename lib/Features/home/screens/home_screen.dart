@@ -32,9 +32,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         body: homeState.when(
           data: (data) =>
               _buildUi(context, user: userState.value ?? User(), home: data),
-          error: (error, _) => Center(
-            child: Text(error.toString()),
-          ),
+          error: (error, _) => _buildUi(context, 
+              user: userState.value ?? User(), 
+              home: Home()),
           loading: () => const Center(child: CircularProgressIndicator()),
         ),
       ),

@@ -16,7 +16,8 @@ class HomeService {
       // if (result.singleData == null) return Home();
       return result;
     } catch (e) {
-      rethrow;
+      // في حالة فشل جلب البيانات، نعيد Home فارغ بدلاً من رمي الخطأ
+      return Home();
     }
   }
 }

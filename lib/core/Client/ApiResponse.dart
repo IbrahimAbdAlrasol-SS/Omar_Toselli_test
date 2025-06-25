@@ -22,15 +22,37 @@ class ApiResponse<T> {
       Map<String, dynamic> json, T Function(Map<String, dynamic>) fromJsonT) {
     dynamic rawData = json['data'];
 
+    List<T>? dataList;
+    T? singleItem;
+    
+    // معالجة البيانات كقائمة
+    if (rawData is List) {
+      try {
+        dataList = [];
+        for (var item in rawData) {
+          if (item is Map<String, dynamic>) {
+            dataList.add(fromJsonT(item));
+          }
+        }
+      } catch (e) {
+        print('خطأ في معالجة البيانات كقائمة: $e');
+      }
+    }
+    
+    // معالجة البيانات كعنصر واحد
+    if (rawData is Map<String, dynamic>) {
+      try {
+        singleItem = fromJsonT(rawData);
+      } catch (e) {
+        print('خطأ في معالجة البيانات كعنصر واحد: $e');
+      }
+    }
+
     var result = ApiResponse<T>(
       code: json['code'],
       message: json['message'],
-      data: rawData is List
-          ? rawData
-              .map((item) => fromJsonT(item as Map<String, dynamic>))
-              .toList()
-          : null,
-      singleData: rawData is Map<String, dynamic> ? fromJsonT(rawData) : null,
+      data: dataList,
+      singleData: singleItem,
       pagination: json['pagination'] != null
           ? Pagination.fromJson(json['pagination'])
           : null,

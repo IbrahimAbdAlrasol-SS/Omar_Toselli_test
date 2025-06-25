@@ -27,15 +27,16 @@ class Home {
       this.orders});
 
   Home.fromJson(Map<String, dynamic> json) {
-    pending = json['pending'];
-    inWarehouse = json['inWarehouse'];
-    inPickUpProgress = json['inPickUpProgress'];
-    inDeliveryProgress = json['inDeliveryProgress'];
-    delivered = json['delivered'];
-    others = json['others'];
-    dailyProfits = json['dailyProfits'];
-    dailyDoneOrders = json['dailyDoneOrders'];
-    dailyReturnedOrders = json['dailyReturnedOrders'];
+    // معالجة القيم العددية بشكل آمن
+    pending = _safeParseInt(json['pending']);
+    inWarehouse = _safeParseInt(json['inWarehouse']);
+    inPickUpProgress = _safeParseInt(json['inPickUpProgress']);
+    inDeliveryProgress = _safeParseInt(json['inDeliveryProgress']);
+    delivered = _safeParseInt(json['delivered']);
+    others = _safeParseInt(json['others']);
+    dailyProfits = _safeParseDouble(json['dailyProfits']);
+    dailyDoneOrders = _safeParseInt(json['dailyDoneOrders']);
+    dailyReturnedOrders = _safeParseInt(json['dailyReturnedOrders']);
     // if (json['notifications'] != null) {
     //   notifications = <Null>[];
     //   json['notifications'].forEach((v) {
@@ -44,9 +45,18 @@ class Home {
     // }
     if (json['orders'] != null) {
       orders = <Order>[];
-      json['orders'].forEach((v) {
-        orders!.add(new Order.fromJson(v));
-      });
+      try {
+        if (json['orders'] is List) {
+          for (var v in json['orders']) {
+            if (v is Map<String, dynamic>) {
+              orders!.add(Order.fromJson(v));
+            }
+          }
+        }
+      } catch (e) {
+        // في حالة حدوث خطأ، نترك orders فارغة
+        print('خطأ في معالجة الطلبات: $e');
+      }
     }
   }
 
@@ -69,5 +79,33 @@ class Home {
       data['orders'] = this.orders!.map((v) => v.toJson()).toList();
     }
     return data;
+  }
+  
+  // دوال مساعدة لمعالجة البيانات بشكل آمن
+  static int? _safeParseInt(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is String) {
+      try {
+        return int.parse(value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+  
+  static double? _safeParseDouble(dynamic value) {
+    if (value == null) return null;
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    if (value is String) {
+      try {
+        return double.parse(value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
   }
 }

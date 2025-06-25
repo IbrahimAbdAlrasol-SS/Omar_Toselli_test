@@ -16,6 +16,11 @@ class HomeNotifier extends _$HomeNotifier {
 
   @override
   FutureOr<Home> build() async {
-    return await get() ?? Home();
+    try {
+      return await get() ?? Home();
+    } catch (e) {
+      // في حالة حدوث خطأ، نعيد Home فارغ بدلاً من رمي الخطأ
+      return Home();
+    }
   }
 }

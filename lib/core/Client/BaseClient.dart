@@ -101,7 +101,8 @@ class BaseClient<T> {
       final response = await _dio.get(endpoint);
       return fromJson!(response.data);
     } on DioException catch (e) {
-      return e.response?.data;
+      // في حالة حدوث خطأ، نرمي الخطأ بدلاً من إرجاع البيانات الخام
+      throw e;
     }
   }
 
