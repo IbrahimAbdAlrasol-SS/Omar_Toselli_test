@@ -1,8 +1,7 @@
 import 'package:Tosell/Features/settings/widgets/support_card_item.dart';
 import 'package:Tosell/Features/settings/widgets/support_enum.dart';
 import 'package:Tosell/Features/settings/widgets/support_model.dart';
-import 'package:Tosell/core/widgets/CustomAppBar.dart';
-import 'package:Tosell/core/widgets/CustomTextFormField.dart';
+import 'package:Tosell/core/widgets/inputs/CustomTextFormField.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';

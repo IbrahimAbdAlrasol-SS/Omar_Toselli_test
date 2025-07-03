@@ -1,5 +1,5 @@
-import 'package:Tosell/core/constants/spaces.dart';
-import 'package:Tosell/core/widgets/TrianglePainter.dart';
+import 'package:Tosell/core/config/constants/spaces.dart';
+import 'package:Tosell/core/widgets/Others/TrianglePainter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';

@@ -1,24 +1,24 @@
 import 'dart:collection';
 
-import 'package:Tosell/core/Model/order/orders/Order.dart';
-import 'package:Tosell/core/Model/order/orders/order_enum.dart';
-import 'package:Tosell/Features/order/screens/order_state_bottom_sheet.dart';
-import 'package:Tosell/core/providers/order/order_commands_provider.dart';
-import 'package:Tosell/core/router/app_router.dart';
-import 'package:Tosell/core/utils/GlobalToast.dart';
-import 'package:Tosell/core/utils/extensions.dart';
-import 'package:Tosell/core/widgets/CustomTextFormField.dart';
-import 'package:Tosell/core/widgets/OutlineButton.dart';
-import 'package:Tosell/core/widgets/custom_phoneNumbrt.dart';
+import 'package:Tosell/core/config/constants/spaces.dart';
+import 'package:Tosell/core/config/routes/app_router.dart';
+import 'package:Tosell/core/utils/extensions/GlobalToast.dart';
+import 'package:Tosell/core/utils/extensions/extensions.dart';
+import 'package:Tosell/core/widgets/Others/CustomAppBar.dart';
+import 'package:Tosell/core/widgets/Others/custom_phoneNumbrt.dart';
+import 'package:Tosell/core/widgets/buttons/FillButton.dart';
+import 'package:Tosell/core/widgets/buttons/OutlineButton.dart';
+import 'package:Tosell/core/widgets/inputs/CustomTextFormField.dart';
+import 'package:Tosell/core/widgets/layouts/custom_section.dart';
+import 'package:Tosell/features/order/presentation/screens/order_state_bottom_sheet.dart';
+import 'package:Tosell/features/orders/data/models/Order.dart';
+import 'package:Tosell/features/orders/data/models/order_enum.dart';
+import 'package:Tosell/features/orders/presentation/providers/order_commands_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
-import 'package:Tosell/core/constants/spaces.dart';
-import 'package:Tosell/core/widgets/CustomAppBar.dart';
-import 'package:Tosell/core/widgets/FillButton.dart';
-import 'package:Tosell/core/widgets/custom_section.dart';
 import 'package:go_router/go_router.dart';
 
 class ChangeStateScreen extends ConsumerStatefulWidget {

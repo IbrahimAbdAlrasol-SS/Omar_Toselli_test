@@ -1,4 +1,4 @@
-import 'package:Tosell/core/Client/ApiResponse.dart';
+import 'package:Tosell/core/api/client/ApiResponse.dart';
 import 'package:Tosell/paging/generic_paged_grid_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

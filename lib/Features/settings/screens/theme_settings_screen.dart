@@ -1,9 +1,9 @@
+import 'package:Tosell/core/config/constants/spaces.dart';
+import 'package:Tosell/core/config/theme/ThemeNotifier.dart';
+import 'package:Tosell/core/widgets/Others/CustomAppBar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:Tosell/core/theme/ThemeNotifier.dart';
-import 'package:Tosell/core/widgets/CustomAppBar.dart';
 import 'package:gap/gap.dart';
-import 'package:Tosell/core/constants/spaces.dart';
 
 class ThemeSettingsScreen extends ConsumerWidget {
   const ThemeSettingsScreen({super.key});

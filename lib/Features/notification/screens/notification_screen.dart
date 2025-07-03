@@ -1,10 +1,10 @@
+import 'package:Tosell/core/config/constants/spaces.dart';
+import 'package:Tosell/core/utils/extensions/extensions.dart';
+import 'package:Tosell/core/utils/helpers/timeAgoArabic.dart';
+import 'package:Tosell/core/widgets/Others/CustomAppBar.dart';
 import 'package:gap/gap.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:Tosell/core/utils/extensions.dart';
-import 'package:Tosell/core/constants/spaces.dart';
-import 'package:Tosell/core/widgets/CustomAppBar.dart';
-import 'package:Tosell/core/helpers/timeAgoArabic.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

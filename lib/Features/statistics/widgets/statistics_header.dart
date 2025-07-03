@@ -1,6 +1,6 @@
+import 'package:Tosell/core/utils/extensions/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:Tosell/core/utils/extensions.dart';
 
 class StatisticsHeader extends StatefulWidget {
   final VoidCallback onDownloadTap;

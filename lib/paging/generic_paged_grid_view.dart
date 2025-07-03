@@ -1,4 +1,4 @@
-import 'package:Tosell/core/Client/ApiResponse.dart';
+import 'package:Tosell/core/api/client/ApiResponse.dart';
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 

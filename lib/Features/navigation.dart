@@ -1,13 +1,13 @@
+import 'package:Tosell/core/config/routes/app_router.dart';
+import 'package:Tosell/core/utils/helpers/SharedPreferencesHelper.dart';
+import 'package:Tosell/core/widgets/layouts/background_wrapper.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:simple_barcode_scanner/enum.dart';
-import 'package:Tosell/core/router/app_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:simple_barcode_scanner/barcode_appbar.dart';
-import 'package:Tosell/core/widgets/background_wrapper.dart';
-import 'package:Tosell/core/helpers/SharedPreferencesHelper.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
 class NavigationPage extends ConsumerStatefulWidget {

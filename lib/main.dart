@@ -1,13 +1,15 @@
 import 'dart:io';
-import 'core/theme/app_theme.dart';
-import 'core/theme/ThemeNotifier.dart';
+
+import 'package:Tosell/core/config/routes/app_router.dart';
+import 'package:Tosell/core/config/theme/ThemeNotifier.dart';
+import 'package:Tosell/core/config/theme/app_theme.dart';
+import 'package:Tosell/core/utils/helpers/HttpOverrides.dart';
+import 'package:Tosell/core/utils/helpers/SharedPreferencesHelper.dart';
 import 'package:flutter/material.dart';
-import 'package:Tosell/core/router/app_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:Tosell/core/helpers/HttpOverrides.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:Tosell/core/helpers/SharedPreferencesHelper.dart';
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
