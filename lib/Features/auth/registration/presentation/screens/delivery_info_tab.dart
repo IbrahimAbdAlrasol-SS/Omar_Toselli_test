@@ -293,172 +293,190 @@ class DeliveryInfoTabState extends ConsumerState<DeliveryInfoTab> {
     );
   }
 
-  Widget _buildZoneDropdown(int index, ZoneLocationInfo zoneInfo) {
-    final selectedGov = zoneInfo.selectedGovernorate;
+  // تحديث دالة buildZoneDropdown في delivery_info_tab.dart
+// تحديث دالة buildZoneDropdown في delivery_info_tab.dart
+Widget _buildZoneDropdown(int index, ZoneLocationInfo zoneInfo) {
+  final selectedGov = zoneInfo.selectedGovernorate;
 
-    return RegistrationSearchDropDown<Zone>(
-      label: "المنطقة",
-      hint: selectedGov == null
-          ? "اختر المحافظة أولاً"
-          : zoneInfo.selectedZone?.name ?? "ابحث عن المنطقة في ${selectedGov.name}...",
-      itemAsString: (zone) => zone.name ?? '',
-      asyncItems: (query) async {
-        if (selectedGov?.id == null) {
-          return [];
+  return RegistrationSearchDropDown<Zone>(
+    label: "المنطقة",
+    hint: selectedGov == null
+        ? "اختر المحافظة أولاً"
+        : zoneInfo.selectedZone?.name ?? "ابحث عن المنطقة في ${selectedGov.name}...",
+    itemAsString: (zone) => zone.name ?? '',
+    asyncItems: (query) async {
+      if (selectedGov?.id == null) {
+        return [];
+      }
+
+      try {
+        print('🔍 محاولة جلب مناطق المحافظة:');
+        print('   - اسم المحافظة: ${selectedGov!.name}');
+        print('   - معرف المحافظة: ${selectedGov.id}');
+        print('   - نص البحث: "$query"');
+
+        // جلب جميع المناطق من API
+        final allZones = await _zoneService.getAllZones();
+        print('📊 إجمالي المناطق من API: ${allZones.length}');
+        
+        // إضافة تشخيص مفصل لمرة واحدة
+        if (query.isEmpty && allZones.isNotEmpty) {
+          print('\n📋 تشخيص البيانات المستلمة:');
+          
+          // إحصائيات حسب المحافظة
+          final governorateStats = <String, List<String>>{};
+          for (final zone in allZones) {
+            final govName = zone.governorate?.name ?? 'غير محدد';
+            final govId = zone.governorate?.id?.toString() ?? 'null';
+            final key = '$govName (ID: $govId)';
+            
+            if (!governorateStats.containsKey(key)) {
+              governorateStats[key] = [];
+            }
+            governorateStats[key]!.add(zone.name ?? 'بدون اسم');
+          }
+          
+          print('📊 توزيع المناطق حسب المحافظة:');
+          governorateStats.forEach((gov, zones) {
+            print('   - $gov: ${zones.length} منطقة');
+            if (zones.length <= 5) {
+              print('     المناطق: ${zones.join(', ')}');
+            } else {
+              print('     أول 5 مناطق: ${zones.take(5).join(', ')}...');
+            }
+          });
+          
+          // فحص أنواع المعرفات
+          final uniqueGovIds = allZones
+              .map((z) => z.governorate?.id)
+              .where((id) => id != null)
+              .toSet();
+          print('\n🔢 معرفات المحافظات الموجودة: $uniqueGovIds');
+          print('   - عدد المحافظات الفريدة: ${uniqueGovIds.length}');
         }
 
-        try {
-          print('🔍 محاولة جلب مناطق المحافظة:');
-          print('   - اسم المحافظة: ${selectedGov!.name}');
-          print('   - معرف المحافظة: ${selectedGov!.id}');
-          print('   - نوع المعرف: ${selectedGov!.id.runtimeType}');
-          print('   - نص البحث: "$query"');
-
-          // ✅ جلب جميع المناطق أولاً للتشخيص
-          final allZones = await _zoneService.getAllZones();
-          print('📊 إجمالي المناطق من API: ${allZones.length}');
-
-          if (allZones.isEmpty) {
-            print('❌ لا توجد مناطق من API على الإطلاق');
-            return [];
+        // فلترة المناطق حسب المحافظة المحددة
+        var filteredZones = allZones.where((zone) {
+          if (zone.governorate?.id == null) {
+            return false;
           }
-
-          // ✅ عرض عينة من البيانات
-          print('📝 عينة من المناطق الأولى:');
-          for (int i = 0; i < allZones.length && i < 3; i++) {
-            final zone = allZones[i];
-            print('   المنطقة ${i + 1}: ${zone.name}');
-            print('     - معرف المنطقة: ${zone.id}');
-            print(
-                '     - معرف المحافظة: ${zone.governorate?.id} (${zone.governorate?.id.runtimeType})');
-            print('     - اسم المحافظة: ${zone.governorate?.name}');
+          
+          final zoneGovId = zone.governorate!.id;
+          final selectedGovId = selectedGov.id;
+          
+          // مقارنة المعرفات بطرق مختلفة
+          bool matches = false;
+          
+          // مقارنة مباشرة
+          if (zoneGovId == selectedGovId) {
+            matches = true;
           }
-
-          var filteredZones = allZones.where((zone) {
-            if (zone.governorate?.id == null) {
-              return false; 
-            }
-
-            final zoneGovId = zone.governorate!.id;
-            final selectedGovId = selectedGov!.id;
-
-            // مقارنة المعرفات مع التعامل مع أنواع البيانات المختلفة
-            bool matches = false;
-            
-            // مقارنة مباشرة
-            if (zoneGovId == selectedGovId) {
-              matches = true;
-            }
-            // مقارنة كنص في حالة اختلاف الأنواع
-            else if (zoneGovId.toString() == selectedGovId.toString()) {
-              matches = true;
-            }
-            // مقارنة كأرقام في حالة كانت النصوص
-            else {
-              try {
-                final zoneIdInt = int.tryParse(zoneGovId.toString());
-                final selectedIdInt = int.tryParse(selectedGovId.toString());
-                if (zoneIdInt != null && selectedIdInt != null && zoneIdInt == selectedIdInt) {
-                  matches = true;
-                }
-              } catch (e) {
-                // تجاهل الأخطاء في التحويل
+          // مقارنة كنص
+          else if (zoneGovId.toString() == selectedGovId.toString()) {
+            matches = true;
+          }
+          // مقارنة كأرقام
+          else {
+            try {
+              final zoneIdInt = int.tryParse(zoneGovId.toString());
+              final selectedIdInt = int.tryParse(selectedGovId.toString());
+              if (zoneIdInt != null && selectedIdInt != null && zoneIdInt == selectedIdInt) {
+                matches = true;
               }
+            } catch (e) {
+              // تجاهل أخطاء التحويل
             }
-
-            if (matches) {
-              print('✅ منطقة مطابقة: ${zone.name} (معرف المحافظة: $zoneGovId)');
-            }
-            
-            return matches;
-          }).toList();
-
-          print('🎯 إجمالي المناطق المفلترة: ${filteredZones.length}');
-
-          if (filteredZones.isEmpty) {
-            print('❌ لا توجد مناطق مطابقة للمحافظة ${selectedGov!.name}');
-            print('🔍 معرف المحافظة المختارة: ${selectedGov!.id} (نوع: ${selectedGov!.id.runtimeType})');
-            
-            // عرض عينة من معرفات المحافظات الموجودة للتشخيص
-            final uniqueGovIds = allZones
-                .map((z) => z.governorate?.id)
-                .where((id) => id != null)
-                .toSet()
-                .take(5) // أول 5 معرفات فقط
-                .toList();
-            print('🔍 عينة من معرفات المحافظات الموجودة: $uniqueGovIds');
           }
-
-          // ✅ فلترة حسب البحث
-          if (query.trim().isNotEmpty && filteredZones.isNotEmpty) {
-            final beforeSearch = filteredZones.length;
-            filteredZones = filteredZones
-                .where((zone) =>
-                    zone.name?.toLowerCase().contains(query.toLowerCase()) ??
-                    false)
-                .toList();
-            print(
-                '🔍 بعد البحث عن "$query": ${filteredZones.length} من $beforeSearch');
+          
+          return matches;
+        }).toList();
+        
+        print('🎯 المناطق المفلترة للمحافظة ${selectedGov.name}: ${filteredZones.length}');
+        
+        // إذا لم نجد مناطق، اطبع تشخيص إضافي
+        if (filteredZones.isEmpty) {
+          print('\n⚠️ تحذير: لا توجد مناطق للمحافظة ${selectedGov.name} (ID: ${selectedGov.id})');
+          print('🔍 التحقق من المشكلة:');
+          
+          // فحص هل المحافظة موجودة في البيانات
+          final hasGovernorate = allZones.any((z) => 
+            z.governorate?.id?.toString() == selectedGov.id.toString() ||
+            z.governorate?.name == selectedGov.name
+          );
+          
+          if (!hasGovernorate) {
+            print('   ❌ المحافظة ${selectedGov.name} غير موجودة في بيانات المناطق');
+            print('   💡 الحل: يجب إضافة مناطق لهذه المحافظة في قاعدة البيانات');
+          } else {
+            print('   ⚠️ المحافظة موجودة لكن المعرفات لا تتطابق');
+            print('   💡 الحل: التحقق من أنواع البيانات في API');
           }
-
-          return filteredZones;
-        } catch (e, stackTrace) {
-          print('❌ خطأ في جلب المناطق: $e');
-          print('📍 تفاصيل الخطأ: $stackTrace');
-          // في حالة الخطأ، نعيد قائمة فارغة مع رسالة واضحة
-          return [];
         }
-      },
-      onChanged: (zone) {
-        print('✅ تم اختيار المنطقة: ${zone?.name}');
-        setState(() {
-          zones[index] = zones[index].copyWith(selectedZone: zone);
-        });
-        _updateParent();
-      },
-      itemBuilder: (context, zone) => Row(
-        children: [
-          Icon(Icons.place,
-              color: const Color(0xFF16CA8B),
-              size: 18), // Primary color from light theme
-          const Gap(8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+
+        // فلترة حسب البحث
+        if (query.trim().isNotEmpty && filteredZones.isNotEmpty) {
+          filteredZones = filteredZones
+              .where((zone) =>
+                  zone.name?.toLowerCase().contains(query.toLowerCase()) ?? false)
+              .toList();
+          print('🔍 بعد البحث عن "$query": ${filteredZones.length} منطقة');
+        }
+
+        return filteredZones;
+      } catch (e, stackTrace) {
+        print('❌ خطأ في جلب المناطق: $e');
+        print('📍 تفاصيل الخطأ: $stackTrace');
+        return [];
+      }
+    },
+    onChanged: (zone) {
+      print('✅ تم اختيار المنطقة: ${zone?.name}');
+      setState(() {
+        zones[index] = zones[index].copyWith(selectedZone: zone);
+      });
+      _updateParent();
+    },
+    itemBuilder: (context, zone) => Row(
+      children: [
+        Icon(Icons.place,
+            color: const Color(0xFF16CA8B),
+            size: 18),
+        const Gap(8),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                zone.name ?? '',
+                style: const TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 16,
+                  fontFamily: "Tajawal",
+                ),
+              ),
+              if (zone.type != null)
                 Text(
-                  zone.name ?? '',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 16,
+                  zone.type == 1 ? 'المركز' : 'الأطراف',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: zone.type == 1
+                        ? const Color(0xFF16CA8B)
+                        : const Color(0xFF698596),
                     fontFamily: "Tajawal",
                   ),
                 ),
-                if (zone.type != null)
-                  Text(
-                    zone.type == 1 ? 'المركز' : 'الأطراف',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: zone.type == 1
-                          ? const Color(
-                              0xFF16CA8B) // Primary color from light theme
-                          : const Color(
-                              0xFF698596), // Secondary color from light theme
-                      fontFamily: "Tajawal",
-                    ),
-                  ),
-              ],
-            ),
+            ],
           ),
-        ],
-      ),
-      emptyText: selectedGov == null
-          ? "اختر المحافظة أولاً"
-          : "لا توجد مناطق متاحة في ${selectedGov.name}",
-      errorText: "خطأ في تحميل المناطق",
-      enableRefresh: true,
-    );
-  }
+        ),
+      ],
+    ),
+    emptyText: selectedGov == null
+        ? "اختر المحافظة أولاً"
+        : "لا توجد مناطق متاحة في ${selectedGov.name}",
+    errorText: "خطأ في تحميل المناطق",
+    enableRefresh: true,
+  );
+}
 
   Widget _buildNearestPointField(int index, ZoneLocationInfo zoneInfo) {
     return CustomTextFormField(

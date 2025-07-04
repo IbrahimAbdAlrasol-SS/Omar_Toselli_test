@@ -23,6 +23,6 @@ class zoneNotifier extends _$zoneNotifier {
 
   @override
   FutureOr<List<Zone>> build() async {
-    return await zoneService.getMyZones();
+    return await zoneService.getAllZones();
   }
 }

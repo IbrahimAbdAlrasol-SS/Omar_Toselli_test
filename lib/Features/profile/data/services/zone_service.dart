@@ -1,139 +1,193 @@
-
-
+// lib/features/profile/data/services/zone_service.dart
 import 'package:Tosell/core/api/client/BaseClient.dart';
-import 'package:Tosell/core/api/endpoints/APIendpoint.dart';
 import 'package:Tosell/features/profile/data/models/zone.dart';
 
 class ZoneService {
-  final BaseClient<Zone> baseClient;
+  final BaseClient<Zone> _baseClient;
 
   ZoneService()
-      : baseClient = BaseClient<Zone>(fromJson: (json) => Zone.fromJson(json));
+      : _baseClient = BaseClient<Zone>(fromJson: (json) => Zone.fromJson(json));
 
-  /// جلب جميع المناطق من الباك اند
-  Future<List<Zone>> getAllZones(
-      {Map<String, dynamic>? queryParams, int page = 1}) async {
+  // جلب جميع المناطق (بدون فلترة)
+  Future<List<Zone>> getAllZones({int? pageSize}) async {
     try {
-      print('🌐 ZoneService: بدء جلب المناطق من ${ProfileEndpoints.zone}');
-      var result = await baseClient.getAll(
-          endpoint: ProfileEndpoints.zone,
-          page: page,
-          queryParams: queryParams);
-
-      print('📊 ZoneService: استجابة API - الرسالة: ${result.message}');
-      print('📊 ZoneService: عدد المناطق المُستلمة: ${result.data?.length ?? 0}');
+      print('🌍 ZoneService: جلب جميع المناطق...');
       
-      if (result.data == null) {
-        print('❌ ZoneService: لا توجد بيانات في الاستجابة');
-        return [];
-      }
-
-      // طباعة عينة من المناطق المُستلمة مع محافظاتها
-      for (int i = 0; i < result.data!.length && i < 5; i++) {
-        final zone = result.data![i];
-        print('   المنطقة ${i + 1}: ${zone.name} (معرف: ${zone.id})');
-        print('     - المحافظة: ${zone.governorate?.name} (معرف: ${zone.governorate?.id})');
+      // إضافة معاملات query للتأكد من جلب جميع البيانات
+      final queryParams = <String, dynamic>{};
+      if (pageSize != null) {
+        queryParams['pageSize'] = pageSize;
+      } else {
+        // طلب عدد كبير من النتائج لضمان جلب جميع المناطق
+        queryParams['pageSize'] = 1000;
       }
       
-      if (result.data!.length > 5) {
-        print('   ... و ${result.data!.length - 5} منطقة أخرى');
+      final result = await _baseClient.getAll(
+        endpoint: '/zone',
+        queryParams: queryParams,
+      );
+      
+      print('📊 تم جلب ${result.data?.length ?? 0} منطقة من الخادم');
+      
+      // طباعة إحصائيات المحافظات
+      if (result.data != null && result.data!.isNotEmpty) {
+        final governorateStats = <String, int>{};
+        for (final zone in result.data!) {
+          final govName = zone.governorate?.name ?? 'غير محدد';
+          governorateStats[govName] = (governorateStats[govName] ?? 0) + 1;
+        }
+        
+        print('📊 إحصائيات المناطق حسب المحافظة:');
+        governorateStats.forEach((gov, count) {
+          print('   - $gov: $count منطقة');
+        });
       }
       
-      // إحصائيات المحافظات
-      final governorateStats = <String, int>{};
-      for (final zone in result.data!) {
-        final govName = zone.governorate?.name ?? 'غير محدد';
-        governorateStats[govName] = (governorateStats[govName] ?? 0) + 1;
-      }
-      
-      print('📈 إحصائيات المناطق حسب المحافظة:');
-      governorateStats.forEach((govName, count) {
-        print('   $govName: $count منطقة');
-      });
-
-      return result.data!;
+      return result.data ?? [];
     } catch (e) {
-      print('❌ ZoneService: خطأ في جلب المناطق: $e');
-      rethrow;
+      print('❌ خطأ في جلب المناطق: $e');
+      return [];
     }
   }
 
-  /// جلب المناطق حسب ID المحافظة مع إمكانية البحث
-  Future<List<Zone>> getZonesByGovernorateId(
-      {required int governorateId, String? query, int page = 1}) async {
+  // جلب مناطق محافظة محددة
+  Future<List<Zone>> getZonesByGovernorate(int governorateId) async {
     try {
-      // جلب جميع المناطق أولاً
-      var allZones = await getAllZones(page: page);
-
-      // تصفية المناطق حسب المحافظة
-      var filteredZones = allZones.where((zone) {
-        return zone.governorate?.id == governorateId;
-      }).toList();
-
-      // تطبيق البحث إذا كان موجوداً
-      if (query != null && query.trim().isNotEmpty) {
-        filteredZones = filteredZones
-            .where((zone) =>
-                zone.name?.toLowerCase().contains(query.toLowerCase()) ?? false)
-            .toList();
-      }
-
-      return filteredZones;
+      print('🏛️ ZoneService: جلب مناطق المحافظة $governorateId...');
+      
+      // استخدام query parameter لفلترة المناطق حسب المحافظة
+      final result = await _baseClient.getAll(
+        endpoint: '/zone',
+        queryParams: {
+          'governorateId': governorateId,
+          'pageSize': 500, // ضمان جلب جميع مناطق المحافظة
+        },
+      );
+      
+      print('📊 تم جلب ${result.data?.length ?? 0} منطقة للمحافظة $governorateId');
+      
+      return result.data ?? [];
     } catch (e) {
-      rethrow;
+      print('❌ خطأ في جلب مناطق المحافظة: $e');
+      return [];
     }
   }
 
-  /// جلب مناطق محددة حسب قائمة من الـ IDs
-  Future<List<Zone>> getZonesByIds(List<int> zoneIds) async {
+  // جلب جميع المناطق مع pagination
+  Future<List<Zone>> getAllZonesWithPagination({
+    int page = 1,
+    int pageSize = 100,
+  }) async {
     try {
-      final allZones = await getAllZones();
-      final filteredZones =
-          allZones.where((zone) => zoneIds.contains(zone.id)).toList();
-
-      return filteredZones;
+      List<Zone> allZones = [];
+      int currentPage = 1;
+      bool hasMorePages = true;
+      
+      print('🔄 بدء جلب جميع المناطق بـ pagination...');
+      
+      while (hasMorePages) {
+        final result = await _baseClient.getAll(
+          endpoint: '/zone',
+          page: currentPage,
+          queryParams: {
+            'pageSize': pageSize,
+          },
+        );
+        
+        if (result.data != null && result.data!.isNotEmpty) {
+          allZones.addAll(result.data!);
+          print('📄 الصفحة $currentPage: تم جلب ${result.data!.length} منطقة');
+          
+          // التحقق من وجود صفحات إضافية
+          if (result.pagination != null && 
+              result.pagination!.currentPage! < result.pagination!.totalPages!) {
+            currentPage++;
+          } else {
+            hasMorePages = false;
+          }
+        } else {
+          hasMorePages = false;
+        }
+      }
+      
+      print('✅ إجمالي المناطق المجلوبة: ${allZones.length}');
+      
+      return allZones;
     } catch (e) {
-      rethrow;
+      print('❌ خطأ في جلب المناطق مع pagination: $e');
+      return [];
     }
   }
 
-  /// البحث في المناطق بالاسم
-  Future<List<Zone>> searchZones(String query, {int page = 1}) async {
+  // طريقة تشخيصية لفحص API
+  Future<void> diagnoseZoneAPI() async {
     try {
-      if (query.trim().isEmpty) {
-        return await getAllZones(page: page);
+      print('🔍 بدء تشخيص Zone API...');
+      
+      // 1. جلب بدون معاملات
+      print('\n1️⃣ جلب بدون معاملات:');
+      var result = await _baseClient.get(endpoint: '/zone');
+      print('   - عدد النتائج: ${result.data?.length ?? 0}');
+      
+      // 2. جلب مع حجم صفحة كبير
+      print('\n2️⃣ جلب مع pageSize=1000:');
+      result = await _baseClient.getAll(
+        endpoint: '/zone',
+        queryParams: {'pageSize': 1000},
+      );
+      print('   - عدد النتائج: ${result.data?.length ?? 0}');
+      
+      // 3. فحص pagination
+      print('\n3️⃣ فحص pagination:');
+      if (result.pagination != null) {
+        print('   - إجمالي العناصر: ${result.pagination!.totalItems}');
+        print('   - إجمالي الصفحات: ${result.pagination!.totalPages}');
+        print('   - حجم الصفحة: ${result.pagination!.pageSize}');
+        print('   - الصفحة الحالية: ${result.pagination!.currentPage}');
+      } else {
+        print('   - لا توجد معلومات pagination');
       }
-
-      final allZones = await getAllZones(page: page);
-      final searchResults = allZones
-          .where((zone) =>
-              zone.name?.toLowerCase().contains(query.toLowerCase()) ?? false)
-          .toList();
-
-      return searchResults;
+      
+      // 4. فحص المحافظات الموجودة
+      print('\n4️⃣ المحافظات الموجودة في النتائج:');
+      if (result.data != null && result.data!.isNotEmpty) {
+        final governorates = <int, String>{};
+        for (final zone in result.data!) {
+          if (zone.governorate?.id != null) {
+            governorates[zone.governorate!.id!] = zone.governorate!.name ?? 'غير محدد';
+          }
+        }
+        governorates.forEach((id, name) {
+          print('   - المحافظة $id: $name');
+        });
+      }
+      
     } catch (e) {
-      rethrow;
+      print('❌ خطأ في التشخيص: $e');
     }
   }
 
-  /// جلب المناطق الخاصة بالتاجر الحالي
-  Future<List<Zone>> getMyZones() async {
+  // البحث في المناطق
+  Future<List<Zone>> searchZones(String query, {int? governorateId}) async {
     try {
-      // لهذا endpoint نحتاج ZoneObject لأنه يرجع { zone: {...} }
-      final zoneObjectClient =
-          BaseClient<ZoneObject>(fromJson: (json) => ZoneObject.fromJson(json));
-
-      var result =
-          await zoneObjectClient.get(endpoint: ProfileEndpoints.merchantZones);
-
-      if (result.data == null) {
-        return [];
+      final queryParams = <String, dynamic>{
+        'search': query,
+        'pageSize': 100,
+      };
+      
+      if (governorateId != null) {
+        queryParams['governorateId'] = governorateId;
       }
-
-      final zones = result.data!.map((e) => e.zone!).toList();
-      return zones;
+      
+      final result = await _baseClient.getAll(
+        endpoint: '/zone',
+        queryParams: queryParams,
+      );
+      
+      return result.data ?? [];
     } catch (e) {
-      rethrow;
+      print('❌ خطأ في البحث عن المناطق: $e');
+      return [];
     }
   }
 }
