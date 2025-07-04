@@ -1,3 +1,4 @@
+// lib/Features/auth/pending_activation/presentation/screens/pending_activation_screen.dart
 import 'package:Tosell/Features/auth/pending_activation/domain/entities/activation_timer_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,6 +13,7 @@ import 'package:Tosell/core/utils/extensions/GlobalToast.dart';
 import 'package:Tosell/core/utils/helpers/SharedPreferencesHelper.dart';
 import '../providers/activation_timer_provider.dart';
 import '../widgets/countdown_timer_widget.dart';
+import '../../data/services/activation_timer_service.dart';
 
 class PendingActivationScreen extends ConsumerStatefulWidget {
   const PendingActivationScreen({super.key});
@@ -21,47 +23,40 @@ class PendingActivationScreen extends ConsumerStatefulWidget {
 }
 
 class _PendingActivationScreenState extends ConsumerState<PendingActivationScreen> {
-  bool _isDisposed = false;
-
   @override
   void initState() {
     super.initState();
-    _checkInitialStatus();
-  }
-  
-  @override
-  void dispose() {
-    _isDisposed = true;
-    super.dispose();
+    // استخدام addPostFrameCallback للتأكد من بناء الـ widget
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _checkInitialStatus();
+      }
+    });
   }
   
   Future<void> _checkInitialStatus() async {
-    // تأخير صغير للتأكد من بناء الـ widget
-    await Future.delayed(const Duration(milliseconds: 100));
+    if (!mounted) return;
     
-    if (_isDisposed || !mounted) return;
-    
-    // فحص فوري عند فتح الشاشة
-    final isActive = await ref.read(activationTimerProvider.notifier).checkActivationStatus();
-    
-    if (_isDisposed || !mounted) return;
-    
-    if (isActive) {
-      _navigateToHome();
+    try {
+      final isActive = await ref.read(activationTimerProvider.notifier).checkActivationStatus();
+      
+      if (!mounted) return;
+      
+      if (isActive) {
+        // استخدام Future.microtask لتجنب مشاكل السياق
+        Future.microtask(() {
+          if (mounted) {
+            GlobalToast.showSuccess(
+              context: context,
+              message: 'تم تفعيل حسابك بنجاح! مرحباً بك في توصيل',
+            );
+            context.go(AppRoutes.home);
+          }
+        });
+      }
+    } catch (e) {
+      print('خطأ في فحص الحالة الأولية: $e');
     }
-  }
-  
-  void _navigateToHome() {
-    if (_isDisposed || !mounted) return;
-    
-    GlobalToast.showSuccess(
-      context: context,
-      message: 'تم تفعيل حسابك بنجاح! مرحباً بك في توصيل',
-    );
-    
-    if (_isDisposed || !mounted) return;
-    
-    context.go(AppRoutes.home);
   }
   
   @override
@@ -69,52 +64,67 @@ class _PendingActivationScreenState extends ConsumerState<PendingActivationScree
     final timerState = ref.watch(activationTimerProvider);
     
     // الاستماع لتغيير حالة التفعيل
-    ref.listen<ActivationTimerState>(activationTimerProvider, (previous, next) {
-      if (_isDisposed || !mounted) return;
-      
-      if (next.isActive && previous != null && !previous.isActive) {
-        _navigateToHome();
-      }
-    });
+    ref.listen<ActivationTimerState>(
+      activationTimerProvider,
+      (previous, next) {
+        if (!mounted) return;
+        
+        if (next.isActive && previous != null && !previous.isActive) {
+          // استخدام Future.microtask لتجنب التحديث أثناء البناء
+          Future.microtask(() {
+            if (mounted) {
+              GlobalToast.showSuccess(
+                context: context,
+                message: 'تم تفعيل حسابك بنجاح! مرحباً بك في توصيل',
+              );
+              context.go(AppRoutes.home);
+            }
+          });
+        }
+      },
+    );
     
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            children: [
-              _buildHeader(context),
-              Expanded(
-                child: Center(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _buildAnimation(),
-                        const Gap(32),
-                        _buildTitle(context),
-                        const Gap(16),
-                        _buildDescription(context),
-                        const Gap(48),
-                        CountdownTimerWidget(
-                          remainingTime: timerState.remainingTime,
-                          isExpired: timerState.isExpired,
-                        ),
-                      ],
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              children: [
+                _buildHeader(),
+                Expanded(
+                  child: Center(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _buildAnimation(),
+                          const Gap(32),
+                          _buildTitle(),
+                          const Gap(16),
+                          _buildDescription(),
+                          const Gap(48),
+                          CountdownTimerWidget(
+                            remainingTime: timerState.remainingTime,
+                            isExpired: timerState.isExpired,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-              _buildActions(context, timerState.isExpired),
-            ],
+                _buildActions(timerState.isExpired),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
   
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -123,7 +133,7 @@ class _PendingActivationScreenState extends ConsumerState<PendingActivationScree
           height: 40,
         ),
         IconButton(
-          onPressed: () => _showLogoutDialog(context),
+          onPressed: _showLogoutDialog,
           icon: Icon(
             Icons.logout,
             color: Theme.of(context).colorScheme.error,
@@ -134,17 +144,38 @@ class _PendingActivationScreenState extends ConsumerState<PendingActivationScree
   }
   
   Widget _buildAnimation() {
+    // في حالة عدم وجود ملف Lottie، استخدم CircularProgressIndicator
     return SizedBox(
       height: 200,
       width: 200,
-      child: Lottie.asset(
-        'assets/animations/waiting.json',
-        repeat: true,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(
+                Theme.of(context).colorScheme.primary,
+              ),
+            ),
+            const Gap(16),
+            Text(
+              'جاري المعالجة...',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.secondary,
+              ),
+            ),
+          ],
+        ),
       ),
+      // إذا كان لديك ملف Lottie، استخدم هذا:
+      // child: Lottie.asset(
+      //   'assets/animations/waiting.json',
+      //   repeat: true,
+      // ),
     );
   }
   
-  Widget _buildTitle(BuildContext context) {
+  Widget _buildTitle() {
     return Text(
       'حسابك قيد المراجعة',
       style: TextStyle(
@@ -156,7 +187,7 @@ class _PendingActivationScreenState extends ConsumerState<PendingActivationScree
     );
   }
   
-  Widget _buildDescription(BuildContext context) {
+  Widget _buildDescription() {
     return Text(
       'شكراً لتسجيلك في منصة توصيل! حسابك حالياً قيد المراجعة من قبل فريقنا.\nسيتم تفعيل حسابك خلال 24 ساعة كحد أقصى.',
       style: TextStyle(
@@ -168,19 +199,19 @@ class _PendingActivationScreenState extends ConsumerState<PendingActivationScree
     );
   }
   
-  Widget _buildActions(BuildContext context, bool isExpired) {
+  Widget _buildActions(bool isExpired) {
     if (isExpired) {
       return Column(
         children: [
           FillButton(
             label: 'تواصل مع الدعم',
-            onPressed: () => _contactSupport(context),
+            onPressed: _contactSupport,
             icon: const Icon(Icons.support_agent, color: Colors.white),
           ),
           const Gap(12),
           OutlinedCustomButton(
             label: 'تسجيل الخروج',
-            onPressed: () => _logout(context),
+            onPressed: _performLogout,
           ),
         ],
       );
@@ -197,7 +228,7 @@ class _PendingActivationScreenState extends ConsumerState<PendingActivationScree
         ),
         const Gap(16),
         TextButton(
-          onPressed: () => _logout(context),
+          onPressed: _performLogout,
           child: Text(
             'تسجيل الخروج',
             style: TextStyle(
@@ -209,8 +240,8 @@ class _PendingActivationScreenState extends ConsumerState<PendingActivationScree
     );
   }
   
-  void _contactSupport(BuildContext context) {
-    if (_isDisposed || !mounted) return;
+  void _contactSupport() {
+    if (!mounted) return;
     
     GlobalToast.show(
       context: context,
@@ -218,23 +249,24 @@ class _PendingActivationScreenState extends ConsumerState<PendingActivationScree
     );
   }
   
-  void _showLogoutDialog(BuildContext context) {
-    if (_isDisposed || !mounted) return;
+  void _showLogoutDialog() {
+    if (!mounted) return;
     
     showDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) => AlertDialog(
         title: const Text('تسجيل الخروج'),
         content: const Text('هل أنت متأكد من تسجيل الخروج؟'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
+            onPressed: () => Navigator.of(dialogContext).pop(),
             child: const Text('إلغاء'),
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(dialogContext);
-              _logout(context);
+              Navigator.of(dialogContext).pop();
+              _performLogout();
             },
             style: TextButton.styleFrom(
               foregroundColor: Theme.of(context).colorScheme.error,
@@ -246,13 +278,23 @@ class _PendingActivationScreenState extends ConsumerState<PendingActivationScree
     );
   }
   
-  Future<void> _logout(BuildContext context) async {
-    if (_isDisposed || !mounted) return;
+  Future<void> _performLogout() async {
+    if (!mounted) return;
     
-    await SharedPreferencesHelper.removeUser();
-    
-    if (_isDisposed || !mounted) return;
-    
-    context.go(AppRoutes.login);
+    try {
+      await SharedPreferencesHelper.removeUser();
+      await ActivationTimerService.clearRegistrationTime();
+      
+      if (!mounted) return;
+      
+      // استخدام Future.microtask لتجنب مشاكل السياق
+      Future.microtask(() {
+        if (mounted) {
+          context.go(AppRoutes.login);
+        }
+      });
+    } catch (e) {
+      print('خطأ في تسجيل الخروج: $e');
+    }
   }
 }

@@ -5,6 +5,8 @@ import 'package:Tosell/core/config/theme/ThemeNotifier.dart';
 import 'package:Tosell/core/config/theme/app_theme.dart';
 import 'package:Tosell/core/utils/helpers/HttpOverrides.dart';
 import 'package:Tosell/core/utils/helpers/SharedPreferencesHelper.dart';
+import 'package:Tosell/features/profile/data/services/governorate_service.dart';
+import 'package:Tosell/features/profile/data/services/zone_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -19,6 +21,8 @@ Future<void> main() async {
   token == null
       ? initialLocation = AppRoutes.login
       : initialLocation = AppRoutes.home;
+
+  _testDataFetching();
 
   runApp(
     ProviderScope(
@@ -56,5 +60,26 @@ class MyApp extends ConsumerWidget {
       supportedLocales: context.supportedLocales,
       locale: context.locale,
     );
+  }
+}
+
+// دالة اختبار جلب البيانات
+Future<void> _testDataFetching() async {
+  try {
+    print('🧪 بدء اختبار جلب البيانات من main.dart');
+    
+    final governorateService = GovernorateService();
+    final zoneService = ZoneService();
+    
+    print('🏛️ اختبار جلب المحافظات...');
+    final governorates = await governorateService.getAllZones();
+    print('✅ تم جلب ${governorates.length} محافظة');
+    
+    print('🌍 اختبار جلب المناطق...');
+    final zones = await zoneService.getAllZones();
+    print('✅ تم جلب ${zones.length} منطقة');
+    
+  } catch (e) {
+    print('❌ خطأ في اختبار جلب البيانات: $e');
   }
 }

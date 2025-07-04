@@ -33,7 +33,7 @@ class ActivationTimerNotifier extends StateNotifier<ActivationTimerState> {
       final remainingTime = ActivationTimerService.calculateRemainingTime(registrationTime);
       final isExpired = ActivationTimerService.isTimerExpired(registrationTime);
       
-      if (!_isDisposed && mounted) {
+      if (!_isDisposed) {
         state = state.copyWith(
           registrationTime: registrationTime,
           remainingTime: remainingTime,
@@ -65,7 +65,7 @@ class ActivationTimerNotifier extends StateNotifier<ActivationTimerState> {
       final remaining = ActivationTimerService.calculateRemainingTime(state.registrationTime);
       
       if (remaining == Duration.zero) {
-        if (mounted) {
+        if (!_isDisposed) {
           state = state.copyWith(
             remainingTime: Duration.zero,
             isExpired: true,
@@ -73,7 +73,7 @@ class ActivationTimerNotifier extends StateNotifier<ActivationTimerState> {
         }
         timer.cancel();
       } else {
-        if (mounted) {
+        if (!_isDisposed) {
           state = state.copyWith(remainingTime: remaining);
         }
       }
@@ -123,7 +123,7 @@ class ActivationTimerNotifier extends StateNotifier<ActivationTimerState> {
       if (isActiveFromToken == true && !state.isActive) {
         print('✅ الحساب مفعل الآن!');
         
-        if (!_isDisposed && mounted) {
+        if (!_isDisposed) {
           state = state.copyWith(isActive: true);
         }
         
@@ -152,19 +152,33 @@ class ActivationTimerNotifier extends StateNotifier<ActivationTimerState> {
   Future<void> startNewTimer() async {
     if (_isDisposed) return;
     
-    final now = DateTime.now();
-    await ActivationTimerService.saveRegistrationTime(now);
+    // التحقق من وجود وقت تسجيل سابق
+    final existingRegistrationTime = await ActivationTimerService.getRegistrationTime();
     
-    if (!_isDisposed && mounted) {
+    DateTime registrationTime;
+    
+    if (existingRegistrationTime != null) {
+      registrationTime = existingRegistrationTime;
+      print('📅 استخدام وقت التسجيل الموجود: $registrationTime');
+    } else {
+      registrationTime = DateTime.now();
+      await ActivationTimerService.saveRegistrationTime(registrationTime);
+      print('📅 حفظ وقت تسجيل جديد: $registrationTime');
+    }
+    
+    final remainingTime = ActivationTimerService.calculateRemainingTime(registrationTime);
+    final isExpired = ActivationTimerService.isTimerExpired(registrationTime);
+    
+    if (!_isDisposed) {
       state = ActivationTimerState(
-        registrationTime: now,
-        remainingTime: const Duration(hours: 24),
-        isExpired: false,
+        registrationTime: registrationTime,
+        remainingTime: remainingTime,
+        isExpired: isExpired,
         isActive: false,
       );
     }
     
-    if (!_isDisposed) {
+    if (!_isDisposed && !isExpired) {
       _startTimer();
       _startActivationCheck();
     }

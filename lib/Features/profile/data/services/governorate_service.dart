@@ -12,17 +12,32 @@ class GovernorateService {
   Future<List<Governorate>> getAllZones(
       {Map<String, dynamic>? queryParams, int page = 1}) async {
     try {
+      print('🌐 GovernorateService: بدء جلب المحافظات من ${ProfileEndpoints.governorate}');
       var result = await baseClient.getAll(
           endpoint: ProfileEndpoints.governorate,
           page: page,
           queryParams: queryParams);
 
+      print('📊 GovernorateService: استجابة API - الرسالة: ${result.message}');
+      print('📊 GovernorateService: عدد المحافظات المُستلمة: ${result.data?.length ?? 0}');
+      
       if (result.data == null) {
+        print('❌ GovernorateService: لا توجد بيانات في الاستجابة');
         return [];
+      }
+
+      for (int i = 0; i < result.data!.length && i < 5; i++) {
+        final gov = result.data![i];
+        print('   المحافظة ${i + 1}: ${gov.name} (معرف: ${gov.id})');
+      }
+      
+      if (result.data!.length > 5) {
+        print('   ... و ${result.data!.length - 5} محافظة أخرى');
       }
 
       return result.data!;
     } catch (e) {
+      print('❌ GovernorateService: خطأ في جلب المحافظات: $e');
       rethrow;
     }
   }

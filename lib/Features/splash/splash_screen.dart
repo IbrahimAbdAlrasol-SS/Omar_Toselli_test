@@ -53,7 +53,7 @@ class _SplashScreenState extends State<SplashScreen>
           .go(initialLocation); // replace with your initial route
     });
 
-    
+
     _checkAuthStatus();
   }
 
@@ -176,8 +176,10 @@ class _SplashScreenState extends State<SplashScreen>
       // التحقق من وجود وقت تسجيل محفوظ
       final registrationTime = await ActivationTimerService.getRegistrationTime();
       if (registrationTime == null) {
-        // حفظ وقت التسجيل إذا لم يكن موجوداً
-        await ActivationTimerService.saveRegistrationTime(DateTime.now());
+        // إذا لم يكن هناك وقت تسجيل محفوظ، فهذا يعني أن الحساب غير مفعل ولكن لم يتم تسجيله حديثاً
+        // في هذه الحالة، نوجه المستخدم لتسجيل الدخول مرة أخرى
+        if (mounted) context.go(AppRoutes.login);
+        return;
       }
       
       if (mounted) context.go(AppRoutes.pendingActivation);

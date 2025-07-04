@@ -14,17 +14,46 @@ class ZoneService {
   Future<List<Zone>> getAllZones(
       {Map<String, dynamic>? queryParams, int page = 1}) async {
     try {
+      print('🌐 ZoneService: بدء جلب المناطق من ${ProfileEndpoints.zone}');
       var result = await baseClient.getAll(
           endpoint: ProfileEndpoints.zone,
           page: page,
           queryParams: queryParams);
 
-      if (result.data == null || result.data!.isEmpty) {
+      print('📊 ZoneService: استجابة API - الرسالة: ${result.message}');
+      print('📊 ZoneService: عدد المناطق المُستلمة: ${result.data?.length ?? 0}');
+      
+      if (result.data == null) {
+        print('❌ ZoneService: لا توجد بيانات في الاستجابة');
         return [];
       }
 
+      // طباعة عينة من المناطق المُستلمة مع محافظاتها
+      for (int i = 0; i < result.data!.length && i < 5; i++) {
+        final zone = result.data![i];
+        print('   المنطقة ${i + 1}: ${zone.name} (معرف: ${zone.id})');
+        print('     - المحافظة: ${zone.governorate?.name} (معرف: ${zone.governorate?.id})');
+      }
+      
+      if (result.data!.length > 5) {
+        print('   ... و ${result.data!.length - 5} منطقة أخرى');
+      }
+      
+      // إحصائيات المحافظات
+      final governorateStats = <String, int>{};
+      for (final zone in result.data!) {
+        final govName = zone.governorate?.name ?? 'غير محدد';
+        governorateStats[govName] = (governorateStats[govName] ?? 0) + 1;
+      }
+      
+      print('📈 إحصائيات المناطق حسب المحافظة:');
+      governorateStats.forEach((govName, count) {
+        print('   $govName: $count منطقة');
+      });
+
       return result.data!;
     } catch (e) {
+      print('❌ ZoneService: خطأ في جلب المناطق: $e');
       rethrow;
     }
   }

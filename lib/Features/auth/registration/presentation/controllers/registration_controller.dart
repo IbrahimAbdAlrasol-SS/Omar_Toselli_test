@@ -38,7 +38,7 @@ class RegistrationController {
       );
 
       if (result.$2 == "REGISTRATION_SUCCESS_PENDING_APPROVAL") {
-        // ✅ بدء المؤقت
+        // ✅ بدء المؤقت (سيتحقق من وجود مؤقت سابق تلقائياً)
         await ref.read(activationTimerProvider.notifier).startNewTimer();
         _showPendingApprovalToast(context);
         await Future.delayed(const Duration(seconds: 3));

@@ -451,7 +451,11 @@ class UserInfoTabState extends ConsumerState<UserInfoTab> {
                       ),
                       const Gap(5),
                       GestureDetector(
-                        onTap: () => context.go(AppRoutes.login),
+                        onTap: () {
+                          if (mounted) {
+                            context.go(AppRoutes.login);
+                          }
+                        },
                         child: Text(
                           "تسجيل الدخول",
                           style: TextStyle(

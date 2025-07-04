@@ -197,8 +197,7 @@ class _MapSelectionScreenState extends State<MapSelectionScreen> {
   }
 
   void _confirmLocation() {
-    if (_isLocationSet) {
-      // إرجاع الإحداثيات للصفحة السابقة
+    if (_isLocationSet && mounted) {
       context.pop({
         'latitude': _currentLocation.latitude,
         'longitude': _currentLocation.longitude,
@@ -407,7 +406,11 @@ class _MapSelectionScreenState extends State<MapSelectionScreen> {
                 // زر إلغاء
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: () => context.pop(),
+                    onPressed: () {
+                      if (mounted) {
+                        context.pop();
+                      }
+                    },
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       side: BorderSide(

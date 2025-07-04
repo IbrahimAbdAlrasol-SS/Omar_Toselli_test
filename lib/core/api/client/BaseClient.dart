@@ -184,9 +184,14 @@ class BaseClient<T> {
       developer.log('✅ استجابة ناجحة - تحويل البيانات', name: 'BaseClient');
       final result = ApiResponse.fromJsonAuto(response.data, fromJson!);
       developer.log('  - Message: ${result.message}', name: 'BaseClient');
+      developer.log('  - Has Single Data: ${result.singleData != null}', name: 'BaseClient');
+      developer.log('  - Has List Data: ${result.data?.isNotEmpty ?? false}', name: 'BaseClient');
       return ApiResponse<T>(
+        code: result.code,
         message: result.message,
-        data: result.data as List<T>? ?? [],
+        data: result.data?.cast<T>() ?? [],
+        singleData: result.singleData as T?,
+        pagination: result.pagination,
         errors: result.errors,
         errorType: result.errorType,
       );

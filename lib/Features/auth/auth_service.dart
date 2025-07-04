@@ -25,20 +25,47 @@ class AuthService {
       );
 
       print('🔐 Auth Service - Login Response:');
+      print('  - Code: ${result.code}');
+      print('  - Message: ${result.message}');
       print('  - Has Single Data: ${result.singleData != null}');
       print('  - Has List Data: ${result.data?.isNotEmpty ?? false}');
-      print('  - Message: ${result.message}');
+      print('  - Data List Length: ${result.data?.length ?? 0}');
+      print('  - Errors: ${result.errors}');
+      
+      // طباعة البيانات الخام إذا كانت موجودة
+      if (result.data != null && result.data!.isNotEmpty) {
+        print('📋 List Data Content:');
+        for (int i = 0; i < result.data!.length; i++) {
+          print('  - Item $i: ${result.data![i]}');
+        }
+      }
 
+      User? user;
+      
+      // التحقق من وجود بيانات المستخدم في singleData
       if (result.singleData != null) {
-        final user = result.singleData!;
-        
+        user = result.singleData!;
+        print('✅ Found user in singleData');
+      }
+      // التحقق من وجود بيانات المستخدم في قائمة البيانات
+      else if (result.data != null && result.data!.isNotEmpty) {
+        user = result.data!.first;
+        print('✅ Found user in data list (first item)');
+      }
+      
+      if (user != null) {
         print('👤 User Info:');
+        print('  - ID: ${user.id}');
         print('  - Username: ${user.userName}');
+        print('  - Phone: ${user.phoneNumber}');
         print('  - Type: ${user.type}');
         print('  - Is Active: ${user.isActive}');
+        print('  - Token: ${user.token != null ? "Present" : "Missing"}');
         
         if (user.isActive == false) {
           print('⚠️ Account is not active - returning ACCOUNT_PENDING_ACTIVATION');
+          // لا نحفظ وقت تسجيل جديد هنا لأن هذا تسجيل دخول وليس تسجيل جديد
+          // وقت التسجيل يجب أن يكون محفوظاً من عملية التسجيل الأصلية
           return (user, "ACCOUNT_PENDING_ACTIVATION");
         }
         
@@ -46,7 +73,15 @@ class AuthService {
         return (user, null);
       }
       
-      print('❌ No user data in response');
+      print('❌ No user data found in response');
+      print('  - Checking if this is a successful operation without user data...');
+      
+      // إذا كانت العملية ناجحة لكن بدون بيانات مستخدم، قد يكون هذا حساب غير مفعل
+      if (result.code == 200 && result.message == "Operation successful") {
+        print('⚠️ Successful operation but no user data - might be pending activation');
+        return (null, "ACCOUNT_PENDING_ACTIVATION");
+      }
+      
       return (null, result.message ?? 'فشل تسجيل الدخول');
     } catch (e) {
       print('💥 Login Exception: $e');
