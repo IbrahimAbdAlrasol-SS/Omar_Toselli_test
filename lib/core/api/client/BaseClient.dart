@@ -186,7 +186,7 @@ class BaseClient<T> {
       developer.log('  - Message: ${result.message}', name: 'BaseClient');
       return ApiResponse<T>(
         message: result.message,
-        data: result.data as List<T>,
+        data: result.data as List<T>? ?? [],
         errors: result.errors,
         errorType: result.errorType,
       );

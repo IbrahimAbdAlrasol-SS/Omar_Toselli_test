@@ -1,20 +1,20 @@
+// lib/Features/auth/registration/presentation/screens/register_screen.dart
+import 'package:Tosell/Features/auth/registration/presentation/constants/registration_assets.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:Tosell/core/config/routes/app_router.dart';
 import 'package:Tosell/core/utils/extensions/GlobalToast.dart';
-import 'package:Tosell/core/utils/extensions/extensions.dart';
-import 'package:Tosell/core/utils/helpers/SharedPreferencesHelper.dart';
-import 'package:Tosell/core/widgets/Others/CustomAppBar.dart';
-import 'package:Tosell/features/auth/login/data/provider/auth_provider.dart';
-import 'package:Tosell/features/auth/login/presentation/constants/login_dimensions.dart';
-import 'package:Tosell/features/auth/registration/presentation/screens/delivery_info_tab.dart';
-import 'package:Tosell/features/auth/registration/presentation/screens/user_info_tab.dart';
-import 'package:Tosell/features/auth/registration/presentation/widgets/build_background.dart';
 import 'package:Tosell/features/profile/data/models/zone.dart';
-import 'package:gap/gap.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../constants/registration_dimensions.dart';
+import '../controllers/registration_controller.dart';
+import '../controllers/tab_controller.dart';
+import '../widgets/registration_header.dart';
+import '../widgets/registration_tab_bar.dart';
+import '../widgets/registration_bottom_sheet.dart';
+import '../widgets/registration_background.dart';
+import 'user_info_tab.dart';
+import 'delivery_info_tab.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -25,315 +25,45 @@ class RegisterScreen extends ConsumerStatefulWidget {
 
 class _RegisterScreenState extends ConsumerState<RegisterScreen>
     with SingleTickerProviderStateMixin {
+  // Controllers
   late TabController _tabController;
+  late RegistrationTabController _registrationTabController;
+  
+  // Keys
+  final GlobalKey<UserInfoTabState> _userInfoTabKey = GlobalKey<UserInfoTabState>();
+  final GlobalKey<DeliveryInfoTabState> _deliveryInfoTabKey = GlobalKey<DeliveryInfoTabState>();
+  
+  // State
   int _currentIndex = 0;
   bool _isSubmitting = false;
-  bool _canNavigateToSecondTab = false;
-  final GlobalKey<UserInfoTabState> _userInfoTabKey =
-      GlobalKey<UserInfoTabState>();
-  final GlobalKey<DeliveryInfoTabState> _deliveryInfoTabKey =
-      GlobalKey<DeliveryInfoTabState>();
-
-  String? fullName;
-  String? brandName;
-  String? userName;
-  String? phoneNumber;
-  String? password;
-  String? brandImg;
-
-  List<Zone> selectedZones = [];
-  double? latitude;
-  double? longitude;
-  String? nearestLandmark;
+  
+  // Form Data
+  final Map<String, dynamic> _userData = {};
+  List<Zone> _selectedZones = [];
+  double? _latitude;
+  double? _longitude;
+  String? _nearestLandmark;
 
   @override
   void initState() {
     super.initState();
+    _initializeControllers();
+  }
+
+  void _initializeControllers() {
     _tabController = TabController(length: 2, vsync: this);
-
-    _tabController.addListener(() {
-      // منع التنقل للتاب الثاني إذا لم يكن مسموحاً
-      if (_tabController.index == 1 && !_canNavigateToSecondTab) {
-        _tabController.animateTo(0);
-        return;
-      }
-
-      if (_tabController.index != _currentIndex) {
-        setState(() {
-          _currentIndex = _tabController.index;
-        });
-      }
-    });
+    _registrationTabController = RegistrationTabController(
+      tabController: _tabController,
+      onTabChanged: (index) {
+        setState(() => _currentIndex = index);
+      },
+    );
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
+    _registrationTabController.dispose();
     super.dispose();
-  }
-
-  void _goToNextTab() {
-    if (_currentIndex < _tabController.length - 1) {
-      // السماح بالتنقل للتاب الثاني عند الضغط على زر التالي
-      setState(() {
-        _canNavigateToSecondTab = true;
-      });
-      _tabController.animateTo(_currentIndex + 1);
-    }
-  }
-
-  void _updateUserInfo({
-    String? fullName,
-    String? brandName,
-    String? userName,
-    String? phoneNumber,
-    String? password,
-    String? brandImg,
-  }) {
-    setState(() {
-      if (fullName != null) this.fullName = fullName;
-      if (brandName != null) this.brandName = brandName;
-      if (userName != null) this.userName = userName;
-      if (phoneNumber != null) this.phoneNumber = phoneNumber;
-      if (password != null) this.password = password;
-      if (brandImg != null) this.brandImg = brandImg;
-    });
-
-    print('📝 تحديث بيانات المستخدم:');
-    print('   الاسم: ${this.fullName}');
-    print('   المتجر: ${this.brandName}');
-    print('   اسم المستخدم: ${this.userName}');
-    print('   الهاتف: ${this.phoneNumber}');
-    print(
-        '   الصورة: ${this.brandImg?.isNotEmpty == true ? 'موجودة' : 'غير موجودة'}');
-  }
-
-  /// ✅ تحديث المناطق والإحداثيات من DeliveryInfoTab
-  void _updateZonesWithLocation({
-    required List<Zone> zones,
-    double? latitude,
-    double? longitude,
-    String? nearestLandmark,
-  }) {
-    setState(() {
-      selectedZones = zones;
-      this.latitude = latitude;
-      this.longitude = longitude;
-      this.nearestLandmark = nearestLandmark;
-    });
-  }
-
-  bool _validateData() {
-    if (fullName?.isEmpty ?? true) {
-      GlobalToast.show(
-          context: context,
-          message: 'اسم صاحب المتجر مطلوب',
-          backgroundColor:
-              const Color(0xFFD54444)); // Error color from light theme
-      _tabController.animateTo(0);
-      return false;
-    }
-    if (brandName?.isEmpty ?? true) {
-      GlobalToast.show(
-          context: context,
-          message: 'اسم المتجر مطلوب',
-          backgroundColor:
-              const Color(0xFFD54444)); // Error color from light theme
-      _tabController.animateTo(0);
-      return false;
-    }
-    if (userName?.isEmpty ?? true) {
-      GlobalToast.show(
-          context: context,
-          message: 'اسم المستخدم مطلوب',
-          backgroundColor: Colors.red);
-      _tabController.animateTo(0);
-      return false;
-    }
-    if (phoneNumber?.isEmpty ?? true) {
-      GlobalToast.show(
-          context: context,
-          message: 'رقم الهاتف مطلوب',
-          backgroundColor: Colors.red);
-      _tabController.animateTo(0);
-      return false;
-    }
-    if (password?.isEmpty ?? true) {
-      GlobalToast.show(
-          context: context,
-          message: 'كلمة المرور مطلوبة',
-          backgroundColor: Colors.red);
-      _tabController.animateTo(0);
-      return false;
-    }
-    if (brandImg?.isEmpty ?? true) {
-      GlobalToast.show(
-          context: context,
-          message: 'صورة المتجر مطلوبة',
-          backgroundColor: Colors.red);
-      _tabController.animateTo(0);
-      return false;
-    }
-    if (selectedZones.isEmpty) {
-      GlobalToast.show(
-          context: context,
-          message: 'يجب إضافة منطقة واحدة على الأقل',
-          backgroundColor: Colors.red);
-      _tabController.animateTo(1);
-      return false;
-    }
-
-    return true;
-  }
-
-  Future<void> _submitRegistration() async {
-    if (!_validateData()) return;
-
-    setState(() {
-      _isSubmitting = true;
-    });
-
-    try {
-      final result = await ref.read(authNotifierProvider.notifier).register(
-            fullName: fullName!,
-            brandName: brandName!,
-            userName: userName!,
-            phoneNumber: phoneNumber!,
-            password: password!,
-            brandImg: brandImg!,
-            zones: selectedZones,
-            latitude: latitude,
-            longitude: longitude,
-            nearestLandmark: nearestLandmark,
-          );
-
-      if (result.$2 == "REGISTRATION_SUCCESS_PENDING_APPROVAL") {
-        // ✅ تسجيل ناجح لكن يحتاج موافقة إدارية
-        GlobalToast.show(
-          context: context,
-          message:
-              "تم تسجيل حسابك بنجاح! سيتم مراجعة طلبك والموافقة عليه خلال 24 ساعة.",
-          backgroundColor:
-              const Color(0xFF16CA8B), // Primary color from light theme
-          textColor: const Color(0xFFFFFFFF), // White text
-        );
-
-        await Future.delayed(const Duration(seconds: 3));
-
-        if (mounted) {
-          // الانتقال إلى شاشة انتظار التفعيل
-          context.go(AppRoutes.pendingActivation);
-        }
-      } else if (result.$1 != null) {
-        // ✅ حالة مثالية: تم التسجيل والحصول على بيانات المستخدم مباشرة
-        await SharedPreferencesHelper.saveUser(result.$1!);
-
-        GlobalToast.showSuccess(
-          context: context,
-          message: 'مرحباً بك في توصيل! تم تفعيل حسابك بنجاح',
-          durationInSeconds: 3,
-        );
-
-        await Future.delayed(const Duration(seconds: 1));
-
-        if (mounted) {
-          context.go(AppRoutes.home);
-        }
-      } else {
-        // ❌ خطأ حقيقي في التسجيل
-        ('❌ فشل التسجيل: ${result.$2}');
-        GlobalToast.show(
-          context: context,
-          message: result.$2 ?? 'فشل في التسجيل',
-          backgroundColor:
-              const Color(0xFFD54444), // Error color from light theme
-          textColor: const Color(0xFFFFFFFF), // White text
-          durationInSeconds: 4,
-        );
-      }
-    } catch (e) {
-      GlobalToast.show(
-        context: context,
-        message: 'خطأ في التسجيل: ${e.toString()}',
-        backgroundColor:
-            const Color(0xFFD54444), // Error color from light theme
-        durationInSeconds: 4,
-      );
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isSubmitting = false;
-        });
-      }
-    }
-  }
-
-  void _clearAllData() {
-    // حذف البيانات من UserInfoTab
-    _userInfoTabKey.currentState?.clearAllFields();
-    // حذف البيانات من DeliveryInfoTab
-    _deliveryInfoTabKey.currentState?.clearAllFields();
-
-    setState(() {
-      fullName = null;
-      brandName = null;
-      userName = null;
-      phoneNumber = null;
-      password = null;
-      brandImg = null;
-      selectedZones.clear();
-      latitude = null;
-      longitude = null;
-      nearestLandmark = null;
-      _canNavigateToSecondTab = false;
-      _currentIndex = 0;
-    });
-    _tabController.animateTo(0);
-  }
-
-  Future<bool> _onWillPop() async {
-    if (fullName?.isNotEmpty == true ||
-        brandName?.isNotEmpty == true ||
-        userName?.isNotEmpty == true ||
-        phoneNumber?.isNotEmpty == true ||
-        brandImg?.isNotEmpty == true ||
-        selectedZones.isNotEmpty) {
-      final shouldExit = await showDialog<bool>(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text(
-                'تأكيد الخروج',
-                style: TextStyle(fontFamily: "Tajawal"),
-              ),
-              content: const Text(
-                'سيتم فقدان جميع البيانات المدخلة. هل تريد الخروج؟',
-                style: TextStyle(fontFamily: "Tajawal"),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  child: const Text('إلغاء',
-                      style: TextStyle(fontFamily: "Tajawal")),
-                ),
-                TextButton(
-                  onPressed: () {
-                    _clearAllData();
-                    Navigator.of(context).pop(true);
-                  },
-                  style: TextButton.styleFrom(
-                      foregroundColor: const Color(
-                          0xFFD54444)), // Error color from light theme
-                  child: const Text('خروج',
-                      style: TextStyle(fontFamily: "Tajawal")),
-                ),
-              ],
-            ),
-          ) ??
-          false;
-      return shouldExit;
-    }
-
-    return true;
   }
 
   @override
@@ -353,8 +83,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
           onTap: () => FocusScope.of(context).unfocus(),
           child: Stack(
             children: [
-              _buildBackgroundSection(),
-              _buildBottomSheetSection(),
+              _buildBackground(),
+              _buildBottomSheet(),
             ],
           ),
         ),
@@ -362,99 +92,39 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
     );
   }
 
-  Widget _buildBackgroundSection() {
+  Widget _buildBackground() {
     return Column(
       children: [
-        Expanded(
-          child: buildBackground(
-            context: context,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Gap(25),
-                CustomAppBar(
-                  titleWidget: Text(
-                    'تسجيل دخول',
-                    style: context.textTheme.bodyMedium!.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xFFFFFFFF), // White color
-                        fontSize: 16),
-                  ),
-                  showBackButton: true,
-                  onBackButtonPressed: () async {
-                    final shouldPop = await _onWillPop();
-                    if (shouldPop && mounted) {
-                      context.push(AppRoutes.login);
-                    }
-                  },
-                ),
-                _buildLogo(),
-                const Gap(10),
-                _buildTitle(),
-                _buildDescription(),
-              ],
-            ),
+        RegistrationBackground(
+          child: RegistrationHeader(
+            onBackPressed: () async {
+              final shouldPop = await _onWillPop();
+              if (shouldPop && mounted) {
+                context.push(AppRoutes.login);
+              }
+            },
           ),
         ),
       ],
     );
   }
 
-  Widget _buildLogo() {
-    return Padding(
-      padding: const EdgeInsets.only(right: 20),
-      child: SvgPicture.asset("assets/svg/Logo.svg"),
-    );
-  }
-
-  Widget _buildTitle() {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20),
-      child: Text(
-        "انشاء حساب جديد",
-        textAlign: TextAlign.right,
-        style: TextStyle(
-          fontWeight: FontWeight.w700,
-          fontSize: 32,
-          color: Colors.white,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDescription() {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20),
-      child: Text(
-        "مرحبا بك في منصة توصيل، قم بادخال المعلومات ادناه و سيتم انشاء حساب لمتجرك بعد الموافقة و التفعيل.",
-        textAlign: TextAlign.right,
-        style: TextStyle(
-          fontWeight: FontWeight.w400,
-          fontSize: 16,
-          color: Colors.white,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBottomSheetSection() {
+  Widget _buildBottomSheet() {
     return DraggableScrollableSheet(
-      initialChildSize: LoginDimensions.initialSheetSize,
-      minChildSize: LoginDimensions.minSheetSize,
-      maxChildSize: LoginDimensions.maxSheetSize,
+      initialChildSize: RegistrationDimensions.initialSheetSize,
+      minChildSize: RegistrationDimensions.minSheetSize,
+      maxChildSize: RegistrationDimensions.maxSheetSize,
       builder: (context, scrollController) {
-        return Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFFFBFAFF), // Surface color from light theme
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-            ),
-          ),
+        return RegistrationBottomSheet(
+          scrollController: scrollController,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              _buildTabBar(),
+              RegistrationTabBar(
+                tabController: _tabController,
+                currentIndex: _currentIndex,
+                onTap: _registrationTabController.goToTab,
+                canNavigateToSecondTab: _registrationTabController.canNavigateToSecondTab,
+              ),
               Expanded(
                 child: _buildTabBarView(),
               ),
@@ -462,74 +132,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
           ),
         );
       },
-    );
-  }
-
-  Widget _buildTabBar() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-      child: TabBar(
-        physics: const NeverScrollableScrollPhysics(),
-        controller: _tabController,
-        indicator: const BoxDecoration(),
-        labelPadding: EdgeInsets.zero,
-        dividerColor: Colors.transparent,
-        onTap: (index) {
-          // السماح بالرجوع للتاب الأول فقط إذا كان التنقل للتاب الثاني مسموحاً
-          if (index == 0 && _canNavigateToSecondTab) {
-            _tabController.animateTo(0);
-          }
-          // منع التنقل للتاب الثاني عبر الضغط المباشر
-          else if (index == 1 && !_canNavigateToSecondTab) {
-            // لا تفعل شيئاً - منع التنقل
-            return;
-          }
-        },
-        tabs: List.generate(2, (i) {
-          final bool isSelected = _currentIndex == i;
-          final bool isCompleted = _currentIndex > i;
-          final String label = i == 0 ? "معلومات الحساب" : "معلومات التوصيل";
-
-          return Tab(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  height: 8,
-                  width: 160.w,
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? const Color(
-                            0xFF16CA8B) // Primary color from light theme
-                        : isCompleted
-                            ? const Color(
-                                0xFF16CA8B) // Primary color from light theme
-                            : const Color(
-                                0xFFE7E0EC), // SurfaceVariant color from light theme
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                ),
-                const Gap(5),
-                Text(
-                  label,
-                  style: TextStyle(
-                    color: isSelected
-                        ? const Color(
-                            0xFF16CA8B) // Primary color from light theme
-                        : isCompleted
-                            ? const Color(
-                                0xFF16CA8B) // Primary color from light theme
-                            : const Color(
-                                0xFF698596), // Secondary color from light theme
-                    fontWeight:
-                        isSelected ? FontWeight.bold : FontWeight.normal,
-                  ),
-                ),
-              ],
-            ),
-          );
-        }),
-      ),
     );
   }
 
@@ -541,74 +143,230 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
         SingleChildScrollView(
           child: UserInfoTab(
             key: _userInfoTabKey,
-            onNext: _goToNextTab,
+            onNext: _handleNextTab,
             onUserInfoChanged: _updateUserInfo,
-            initialData: {
-              'fullName': fullName,
-              'brandName': brandName,
-              'userName': userName,
-              'phoneNumber': phoneNumber,
-              'password': password,
-              'brandImg': brandImg,
-            },
+            initialData: _userData,
           ),
         ),
         SingleChildScrollView(
           child: Column(
             children: [
-              // ****************************************
               DeliveryInfoTab(
                 key: _deliveryInfoTabKey,
                 onZonesChangedWithLocation: _updateZonesWithLocation,
-                initialZones: selectedZones,
+                initialZones: _selectedZones,
               ),
-              // ****************************************
-
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color:
-                      const Color(0xFFFBFAFF), // Surface color from light theme
-                  border: Border(
-                    top: BorderSide(
-                        color: const Color(
-                            0xFFEAEEF0)), // Outline color from light theme
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: _isSubmitting
-                            ? null
-                            : () => _tabController.animateTo(0),
-                        child: const Text('السابق'),
-                      ),
-                    ),
-                    const Gap(16),
-                    Expanded(
-                      flex: 2,
-                      child: FilledButton(
-                        onPressed: _isSubmitting ? null : _submitRegistration,
-                        child: _isSubmitting
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : const Text('إنشاء الحساب'),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              _buildSubmitButtons(),
             ],
           ),
         ),
       ],
     );
+  }
+
+  Widget _buildSubmitButtons() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFBFAFF),
+        border: Border(
+          top: BorderSide(color: const Color(0xFFEAEEF0)),
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: OutlinedButton(
+              onPressed: _isSubmitting 
+                  ? null 
+                  : () => _registrationTabController.goToPreviousTab(),
+              child: const Text('السابق'),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            flex: 2,
+            child: FilledButton(
+              onPressed: _isSubmitting ? null : _submitRegistration,
+              child: _isSubmitting
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : const Text('إنشاء الحساب'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _handleNextTab() {
+    _registrationTabController.goToNextTab();
+  }
+
+  void _updateUserInfo({
+    String? fullName,
+    String? brandName,
+    String? userName,
+    String? phoneNumber,
+    String? password,
+    String? brandImg,
+  }) {
+    setState(() {
+      if (fullName != null) _userData['fullName'] = fullName;
+      if (brandName != null) _userData['brandName'] = brandName;
+      if (userName != null) _userData['userName'] = userName;
+      if (phoneNumber != null) _userData['phoneNumber'] = phoneNumber;
+      if (password != null) _userData['password'] = password;
+      if (brandImg != null) _userData['brandImg'] = brandImg;
+    });
+  }
+
+  void _updateZonesWithLocation({
+    required List<Zone> zones,
+    double? latitude,
+    double? longitude,
+    String? nearestLandmark,
+  }) {
+    setState(() {
+      _selectedZones = zones;
+      _latitude = latitude;
+      _longitude = longitude;
+      _nearestLandmark = nearestLandmark;
+    });
+  }
+
+  Future<void> _submitRegistration() async {
+    if (!_validateData()) return;
+
+    setState(() => _isSubmitting = true);
+
+    try {
+      await RegistrationController.handleRegistration(
+        context: context,
+        ref: ref,
+        fullName: _userData['fullName']!,
+        brandName: _userData['brandName']!,
+        userName: _userData['userName']!,
+        phoneNumber: _userData['phoneNumber']!,
+        password: _userData['password']!,
+        brandImg: _userData['brandImg']!,
+        zones: _selectedZones,
+        latitude: _latitude,
+        longitude: _longitude,
+        nearestLandmark: _nearestLandmark,
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+      }
+    }
+  }
+
+  bool _validateData() {
+    // Validate user info
+    final userInfoErrors = <String>[];
+    
+    if (_userData['fullName']?.isEmpty ?? true) {
+      userInfoErrors.add('اسم صاحب المتجر مطلوب');
+    }
+    if (_userData['brandName']?.isEmpty ?? true) {
+      userInfoErrors.add('اسم المتجر مطلوب');
+    }
+    if (_userData['userName']?.isEmpty ?? true) {
+      userInfoErrors.add('اسم المستخدم مطلوب');
+    }
+    if (_userData['phoneNumber']?.isEmpty ?? true) {
+      userInfoErrors.add('رقم الهاتف مطلوب');
+    }
+    if (_userData['password']?.isEmpty ?? true) {
+      userInfoErrors.add('كلمة المرور مطلوبة');
+    }
+    if (_userData['brandImg']?.isEmpty ?? true) {
+      userInfoErrors.add('صورة المتجر مطلوبة');
+    }
+
+    if (userInfoErrors.isNotEmpty) {
+      GlobalToast.show(
+        context: context,
+        message: userInfoErrors.first,
+        backgroundColor: const Color(0xFFD54444),
+      );
+      _tabController.animateTo(0);
+      return false;
+    }
+
+    // Validate delivery info
+    if (_selectedZones.isEmpty) {
+      GlobalToast.show(
+        context: context,
+        message: 'يجب إضافة منطقة واحدة على الأقل',
+        backgroundColor: const Color(0xFFD54444),
+      );
+      _tabController.animateTo(1);
+      return false;
+    }
+
+    return true;
+  }
+
+  Future<bool> _onWillPop() async {
+    if (_hasData()) {
+      final shouldExit = await _showExitConfirmation();
+      if (shouldExit == true) {
+        _clearAllData();
+      }
+      return shouldExit ?? false;
+    }
+    return true;
+  }
+
+  bool _hasData() {
+    return _userData.isNotEmpty || _selectedZones.isNotEmpty;
+  }
+
+  Future<bool?> _showExitConfirmation() {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text(
+          'تأكيد الخروج',
+          style: TextStyle(fontFamily: "Tajawal"),
+        ),
+        content: const Text(
+          'سيتم فقدان جميع البيانات المدخلة. هل تريد الخروج؟',
+          style: TextStyle(fontFamily: "Tajawal"),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('إلغاء', style: TextStyle(fontFamily: "Tajawal")),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: TextButton.styleFrom(foregroundColor: const Color(0xFFD54444)),
+            child: const Text('خروج', style: TextStyle(fontFamily: "Tajawal")),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _clearAllData() {
+    _userInfoTabKey.currentState?.clearAllFields();
+    _deliveryInfoTabKey.currentState?.clearAllFields();
+    setState(() {
+      _userData.clear();
+      _selectedZones.clear();
+      _latitude = null;
+      _longitude = null;
+      _nearestLandmark = null;
+    });
+    _registrationTabController.resetToFirstTab();
   }
 }
