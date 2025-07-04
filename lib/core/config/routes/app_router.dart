@@ -1,3 +1,4 @@
+import 'package:Tosell/Features/auth/pending_activation/presentation/screens/pending_activation_screen.dart';
 import 'package:Tosell/Features/navigation.dart';
 import 'package:Tosell/Features/notification/screens/notification_screen.dart';
 import 'package:Tosell/Features/settings/screens/theme_settings_screen.dart';
@@ -241,6 +242,12 @@ final GoRouter appRouter = GoRouter(
         child: ThemeSettingsScreen(),
       ),
     ),
+    GoRoute(
+  path: AppRoutes.pendingActivation,
+  builder: (context, state) => const BackgroundWrapper(
+    child: PendingActivationScreen(),
+  ),
+),
   ],
 );
 
@@ -269,6 +276,8 @@ Widget _slideFromLeftTransition(
 }
 
 class AppRoutes {
+  static const String pendingActivation = '/pending-activation';
+
   static const String splash = '/';
   static const String orderCompleted = '/orderCompleted';
   static const String order = '/order';
@@ -304,6 +313,5 @@ class AppRoutes {
   static const String ForgotpasswordnumbernamePass =
       '/ForgotPasswordNumberNamePass';
   static const String shipmentOrders = '/shipment-orders';
-  static const String pendingActivation = '/pending-activation';
   static const String themeSettings = '/theme-settings';
 }

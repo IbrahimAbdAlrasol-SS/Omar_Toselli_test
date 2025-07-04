@@ -6,6 +6,7 @@ import 'package:Tosell/core/config/routes/app_router.dart';
 import 'package:Tosell/core/utils/extensions/GlobalToast.dart';
 import 'package:Tosell/features/auth/login/data/provider/auth_provider.dart';
 import 'package:Tosell/features/profile/data/models/zone.dart';
+import 'package:Tosell/features/auth/pending_activation/presentation/providers/activation_timer_provider.dart';
 
 class RegistrationController {
   static Future<void> handleRegistration({
@@ -37,6 +38,8 @@ class RegistrationController {
       );
 
       if (result.$2 == "REGISTRATION_SUCCESS_PENDING_APPROVAL") {
+        // ✅ بدء المؤقت
+        await ref.read(activationTimerProvider.notifier).startNewTimer();
         _showPendingApprovalToast(context);
         await Future.delayed(const Duration(seconds: 3));
         if (context.mounted) {

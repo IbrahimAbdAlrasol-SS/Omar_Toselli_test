@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'package:Tosell/Features/auth/pending_activation/data/services/activation_timer_service.dart';
 import 'package:Tosell/core/config/routes/app_router.dart';
+import 'package:Tosell/core/utils/helpers/SharedPreferencesHelper.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -22,9 +24,11 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
 
+
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
+      
     );
 
     _topCircleOffset = Tween<Offset>(
@@ -48,6 +52,9 @@ class _SplashScreenState extends State<SplashScreen>
       GoRouter.of(context)
           .go(initialLocation); // replace with your initial route
     });
+
+    
+    _checkAuthStatus();
   }
 
   @override
@@ -145,8 +152,39 @@ class _SplashScreenState extends State<SplashScreen>
               ),
             ),
           ),
+          /// Loading indicator
+           const CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            ),
         ],
       ),
     );
+  }
+  Future<void> _checkAuthStatus() async {
+    await Future.delayed(const Duration(seconds: 2));
+    
+    final user = await SharedPreferencesHelper.getUser();
+    
+    if (user == null) {
+      // غير مسجل دخول
+      if (mounted) context.go(AppRoutes.login);
+      return;
+    }
+    
+    // التحقق من حالة التفعيل
+    if (user.isActive == false) {
+      // التحقق من وجود وقت تسجيل محفوظ
+      final registrationTime = await ActivationTimerService.getRegistrationTime();
+      if (registrationTime == null) {
+        // حفظ وقت التسجيل إذا لم يكن موجوداً
+        await ActivationTimerService.saveRegistrationTime(DateTime.now());
+      }
+      
+      if (mounted) context.go(AppRoutes.pendingActivation);
+      return;
+    }
+    
+    // الحساب مفعل
+    if (mounted) context.go(AppRoutes.home);
   }
 }
