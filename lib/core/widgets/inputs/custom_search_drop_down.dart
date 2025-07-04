@@ -139,67 +139,75 @@ class _RegistrationSearchDropDownState<T>
   }
 
   void _onTextChanged(String value) {
-    final trimmedValue = value.trim();
+  final trimmedValue = value.trim();
 
-    if (trimmedValue != _lastQuery) {
+  if (trimmedValue != _lastQuery) {
+    setState(() {
+      _suggestions = [];
+      _hasError = false;
+    });
+    _updateOverlay();
+  }
+
+  _debounceTimer?.cancel();
+
+  if (trimmedValue.isNotEmpty) {
+    setState(() => _isLoading = true);
+    // تقليل التأخير إلى 100 مللي ثانية فقط للبحث الفوري
+    _debounceTimer = Timer(const Duration(milliseconds: 100), () {
+      _searchItems(trimmedValue);
+    });
+  } else {
+    setState(() {
+      _isLoading = false;
+      _hasError = false;
+    });
+    if (_hasLoadedInitial) {
+      _loadInitialData();
+    }
+  }
+  _lastQuery = trimmedValue;
+}
+
+  // تحديث دالة _searchItems لتكون أسرع:
+Future<void> _searchItems(String query, {bool immediate = false}) async {
+  if (!mounted) return;
+
+  if (!immediate) {
+    setState(() {
+      _isLoading = true;
+      _hasError = false;
+    });
+  }
+  
+  try {
+    print('🔍 بحث فوري عن: "$query"');
+    final startTime = DateTime.now();
+    
+    final results = await widget.asyncItems(query);
+    
+    final duration = DateTime.now().difference(startTime);
+    print('⏱️ وقت البحث: ${duration.inMilliseconds} مللي ثانية');
+    
+    if (mounted && (query.isEmpty || query == _controller.text.trim())) {
       setState(() {
-        _suggestions = [];
+        _suggestions = results;
+        _isLoading = false;
         _hasError = false;
       });
       _updateOverlay();
     }
-
-    _debounceTimer?.cancel();
-
-    if (trimmedValue.isNotEmpty) {
-      setState(() => _isLoading = true);
-      // بحث فوري مع تأخير قصير
-      _debounceTimer = Timer(const Duration(milliseconds: 100), () {
-        _searchItems(trimmedValue);
-      });
-    } else {
+  } catch (e) {
+    if (mounted && (query.isEmpty || query == _controller.text.trim())) {
       setState(() {
+        _suggestions = [];
         _isLoading = false;
-        _hasError = false;
+        _hasError = true;
       });
-      if (_hasLoadedInitial) {
-        _loadInitialData();
-      }
-    }
-    _lastQuery = trimmedValue;
-  }
-
-  Future<void> _searchItems(String query, {bool immediate = false}) async {
-    if (!mounted) return;
-
-    if (!immediate) {
-      setState(() {
-        _isLoading = true;
-        _hasError = false;
-      });
-    }
-    try {
-      print('🔍 بحث: "$query"');
-      final results = await widget.asyncItems(query);
-      if (mounted && (query.isEmpty || query == _controller.text.trim())) {
-        setState(() {
-          _suggestions = results;
-          _isLoading = false;
-          _hasError = false;
-        });
-        _updateOverlay();
-      }
-    } catch (e) {
-      if (mounted && (query.isEmpty || query == _controller.text.trim())) {
-        setState(() {
-          _suggestions = [];
-          _isLoading = false;
-          _hasError = true;
-        });
-        _updateOverlay();
-      }
+      _updateOverlay();
     }
   }
+}
 
   void _showSuggestions() {
     if (!_showDropdown) {

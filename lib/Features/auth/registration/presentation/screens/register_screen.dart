@@ -1,5 +1,6 @@
 // lib/Features/auth/registration/presentation/screens/register_screen.dart
 import 'package:Tosell/Features/auth/registration/presentation/constants/registration_assets.dart';
+import 'package:Tosell/features/auth/registration/presentation/screens/delivery_info_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
