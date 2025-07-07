@@ -1,22 +1,24 @@
-import 'package:Tosell/Features/auth/pending_activation/presentation/screens/pending_activation_screen.dart';
-import 'package:Tosell/Features/navigation.dart';
-import 'package:Tosell/Features/notification/screens/notification_screen.dart';
-import 'package:Tosell/Features/settings/screens/theme_settings_screen.dart';
-import 'package:Tosell/Features/settings/widgets/support_record_screen.dart';
-import 'package:Tosell/Features/statistics/screens/statistics_screen.dart';
+
+import 'package:Tosell/features/auth/login/ForgotPassword/ForgotPasswordAuth.dart';
+import 'package:Tosell/features/auth/login/ForgotPassword/ForgotPasswordNumber.dart';
+import 'package:Tosell/features/auth/login/ForgotPassword/ForgotPasswordNumberNamePass.dart';
+import 'package:Tosell/features/auth/login/screens/login_screen.dart';
+
+import 'package:Tosell/features/auth/register/screens/map_selection_screen.dart';
+import 'package:Tosell/features/auth/register/screens/register_screen.dart';
+import 'package:Tosell/features/navigation.dart';
+import 'package:Tosell/features/notification/screens/notification_screen.dart';
+
+import 'package:Tosell/features/order/screens/add_order_screen.dart';
+import 'package:Tosell/features/order/screens/order_completed.dart';
+import 'package:Tosell/features/order/screens/order_details_screen.dart';
+import 'package:Tosell/features/order/screens/order_screen.dart';
+import 'package:Tosell/features/settings/screens/theme_settings_screen.dart';
+import 'package:Tosell/features/settings/widgets/support_record_screen.dart';
+import 'package:Tosell/features/statistics/screens/statistics_screen.dart';
 import 'package:Tosell/core/widgets/layouts/background_wrapper.dart';
-import 'package:Tosell/features/auth/login/presentation/screens/login_screen.dart';
-import 'package:Tosell/features/auth/login/presentation/widgets/ForgotPasswordAuth.dart';
-import 'package:Tosell/features/auth/login/presentation/widgets/ForgotPasswordNumber.dart';
-import 'package:Tosell/features/auth/login/presentation/widgets/ForgotPasswordNumberNamePass.dart';
-import 'package:Tosell/features/auth/registration/presentation/screens/map_selection_screen.dart';
-import 'package:Tosell/features/auth/registration/presentation/screens/register_screen.dart';
 import 'package:Tosell/features/changeState/screens/change_state_screen.dart';
 import 'package:Tosell/features/home/presentation/screens/home_screen.dart';
-import 'package:Tosell/features/order/presentation/screens/add_order_screen.dart';
-import 'package:Tosell/features/order/presentation/screens/order_completed.dart';
-import 'package:Tosell/features/order/presentation/screens/order_details_screen.dart';
-import 'package:Tosell/features/order/presentation/screens/order_screen.dart';
 import 'package:Tosell/features/orders/data/models/OrderFilter.dart';
 import 'package:Tosell/features/orders/presentation/screens/orders_screen.dart';
 import 'package:Tosell/features/orders/presentation/screens/shipment_details_screen.dart';
@@ -242,12 +244,7 @@ final GoRouter appRouter = GoRouter(
         child: ThemeSettingsScreen(),
       ),
     ),
-    GoRoute(
-  path: AppRoutes.pendingActivation,
-  builder: (context, state) => const BackgroundWrapper(
-    child: PendingActivationScreen(),
-  ),
-),
+    
   ],
 );
 

@@ -1,3 +1,4 @@
+ import 'package:Tosell/Features/profile/providers/profile_provider.dart';
 import 'package:Tosell/core/config/constants/spaces.dart';
 import 'package:Tosell/core/config/routes/app_router.dart';
 import 'package:Tosell/core/model_core/User.dart';
@@ -5,7 +6,6 @@ import 'package:Tosell/core/widgets/Others/CustomAppBar.dart';
 import 'package:Tosell/core/widgets/Others/build_cart.dart';
 import 'package:Tosell/features/home/data/models/Home.dart';
 import 'package:Tosell/features/home/presentation/providers/home_provider.dart';
-import 'package:Tosell/features/profile/presentation/providers/profile_provider.dart';
 import 'package:Tosell/features/profile/presentation/screens/myProfile_Screen.dart';
 import 'package:gap/gap.dart';
 import 'package:flutter/material.dart';
@@ -118,25 +118,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ),
                 const Gap(AppSpaces.small),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    buildCart(
-                      context,
-                      title: "قيد التوصيل",
-                      subtitle: home.inDeliveryProgress?.toString() ?? 'لايوجد',
-                      iconPath: "assets/svg/Truck.svg",
-                      iconColor: Theme.of(context).colorScheme.error,
-                    ),
-                    const Gap(AppSpaces.small),
-                    buildCart(
-                      context,
-                      title: "تم الإستلام",
-                      subtitle: home.delivered?.toString() ?? 'لايوجد',
-                      iconPath: "assets/svg/Checks.svg",
-                      iconColor: Theme.of(context).colorScheme.primary,
-                    ),
-                  ],
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      buildCart(
+                        context,
+                        title: "قيد التوصيل",
+                        subtitle:
+                            home.inDeliveryProgress?.toString() ?? 'لايوجد',
+                        iconPath: "assets/svg/Truck.svg",
+                        iconColor: Theme.of(context).colorScheme.error,
+                      ),
+                      const Gap(AppSpaces.small),
+                      buildCart(
+                        context,
+                        title: "تم الإستلام",
+                        subtitle: home.delivered?.toString() ?? 'لايوجد',
+                        iconPath: "assets/svg/Checks.svg",
+                        iconColor: Theme.of(context).colorScheme.primary,
+                      ),
+                    ],
+                  ),
                 ),
                 const Gap(AppSpaces.large),
                 buildTitle(
@@ -146,31 +150,40 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       GoRouter.of(context).push(AppRoutes.transactions),
                 ),
                 const Gap(AppSpaces.small),
-                buildCart(
-                  context,
-                  title: "إجمالي الأرباح",
-                  subtitle: home.dailyProfits?.toInt().toString() ?? 'لايوجد',
-                  iconPath: "assets/svg/coines.svg",
-                  iconColor: Theme.of(context).colorScheme.primary,
-                  expanded: false,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: buildCart(
+                    context,
+                    title: "إجمالي الأرباح",
+                    subtitle: home.dailyProfits?.toInt().toString() ?? 'لايوجد',
+                    iconPath: "assets/svg/coines.svg",
+                    iconColor: Theme.of(context).colorScheme.primary,
+                    expanded: false,
+                  ),
                 ),
                 const Gap(AppSpaces.exSmall),
-                buildCart(
-                  context,
-                  title: "الطلبات المكتملة",
-                  subtitle: home.dailyDoneOrders?.toString() ?? 'لايوجد',
-                  iconPath: "assets/svg/CheckSquare.svg",
-                  iconColor: Theme.of(context).colorScheme.primary,
-                  expanded: false,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: buildCart(
+                    context,
+                    title: "الطلبات المكتملة",
+                    subtitle: home.dailyDoneOrders?.toString() ?? 'لايوجد',
+                    iconPath: "assets/svg/CheckSquare.svg",
+                    iconColor: Theme.of(context).colorScheme.primary,
+                    expanded: false,
+                  ),
                 ),
                 const Gap(AppSpaces.exSmall),
-                buildCart(
-                  context,
-                  title: "الطلبات المرتجعة",
-                  subtitle: home.dailyReturnedOrders?.toString() ?? 'لايوجد',
-                  iconPath: "assets/svg/BoxArrowDown.svg",
-                  iconColor: Theme.of(context).colorScheme.error,
-                  expanded: false,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: buildCart(
+                    context,
+                    title: "الطلبات المرتجعة",
+                    subtitle: home.dailyReturnedOrders?.toString() ?? 'لايوجد',
+                    iconPath: "assets/svg/BoxArrowDown.svg",
+                    iconColor: Theme.of(context).colorScheme.error,
+                    expanded: false,
+                  ),
                 ),
                 const Gap(AppSpaces.large),
                 buildTitle(
@@ -183,7 +196,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemBuilder: (context, index) => Padding(
-                    padding: const EdgeInsets.only(bottom: 7.0),
+                    padding: const EdgeInsets.only(
+                        bottom: 7.0, left: 8.0, right: 8.0),
                     child: GestureDetector(
                       onTap: () => context.push(AppRoutes.orderDetails,
                           extra: home.orders?[index].id),
