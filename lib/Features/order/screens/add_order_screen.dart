@@ -9,15 +9,16 @@ import 'package:gap/gap.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
- 
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
- import 'package:Tosell/Features/profile/models/zone.dart';
+import 'package:Tosell/Features/profile/models/zone.dart';
 import 'package:Tosell/Features/order/models/Location.dart';
- import 'package:Tosell/Features/order/widgets/Geolocator.dart';
+import 'package:Tosell/Features/order/widgets/Geolocator.dart';
 import 'package:Tosell/Features/order/models/add_order_form.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 import 'package:Tosell/Features/profile/providers/zone_provider.dart';
 import 'package:Tosell/Features/order/providers/order_commands_provider.dart';
+import 'package:Tosell/core/widgets/inputs/custom_search_drop_down.dart';
 
 class AddOrderScreen extends ConsumerStatefulWidget {
   const AddOrderScreen({super.key});
@@ -318,6 +319,7 @@ class _AddOrderScreenState extends ConsumerState<AddOrderScreen> {
                         child: CustomTextFormField(
                           label: "رقم الهاتف",
                           hint: 'مثال: "07x xxx xxxx"',
+                          keyboardType: TextInputType.number,
                           onFieldSubmitted: (_) {
                             FocusScope.of(context)
                                 .unfocus(); // This hides the keyboard
@@ -331,6 +333,7 @@ class _AddOrderScreenState extends ConsumerState<AddOrderScreen> {
                         child: CustomTextFormField(
                           label: "رقم الهاتف الثاني",
                           hint: 'مثال: "07x xxx xxxx"',
+                          keyboardType: TextInputType.number,
                           onFieldSubmitted: (_) {
                             FocusScope.of(context)
                                 .unfocus(); // This hides the keyboard
@@ -341,66 +344,90 @@ class _AddOrderScreenState extends ConsumerState<AddOrderScreen> {
                       Padding(
                         padding: const EdgeInsets.only(
                             top: 8.0, bottom: 13.0, right: 8.0, left: 8.0),
-                        child: CustomTextFormField<String>(
+                        child: RegistrationSearchDropDown<Governorate>(
                           label: "المحافظة",
-                          hint: "مثال: 'بغداد'",
-                          dropdownItems: governorateZones.map((gov) {
-                            return DropdownMenuItem<String>(
-                              value: gov.id?.toString() ?? '',
-                              child: Text(gov.name ?? 'Unknown'),
-                            );
-                          }).toList(),
-                          // controller: _governorateIdController,
-                          selectedValue: _selectedGovernorateId,
-                          onDropdownChanged: (value) => _loadZones(value ?? ''),
-
-                          suffixInner: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: GestureDetector(
-                              onTap: () {},
-                              child: SvgPicture.asset(
-                                "assets/svg/CaretDown.svg",
-                                width: 24,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                            ),
-                          ),
+                          hint: "ابحث عن المحافظة...",
+                          selectedValue: governorateZones
+                                      .firstWhere(
+                                        (gov) =>
+                                            gov.id?.toString() ==
+                                            _selectedGovernorateId,
+                                        orElse: () => Governorate(),
+                                      )
+                                      .id !=
+                                  null
+                              ? governorateZones.firstWhere(
+                                  (gov) =>
+                                      gov.id?.toString() ==
+                                      _selectedGovernorateId,
+                                )
+                              : null,
+                          itemAsString: (gov) => gov.name ?? 'غير محدد',
+                          asyncItems: (query) async {
+                            if (query.isEmpty) {
+                              return governorateZones;
+                            }
+                            return governorateZones
+                                .where((gov) => (gov.name ?? '')
+                                    .toLowerCase()
+                                    .contains(query.toLowerCase()))
+                                .toList();
+                          },
+                          onChanged: (selectedGov) {
+                            setState(() {
+                              _selectedGovernorateId =
+                                  selectedGov?.id?.toString();
+                              _SelectedCityId = null; // Reset city selection
+                              deliveryZones = []; // Clear zones
+                            });
+                            if (selectedGov?.id != null) {
+                              _loadZones(selectedGov!.id.toString());
+                            }
+                          },
                         ),
                       ),
 
                       Padding(
                         padding: const EdgeInsets.only(
                             top: 8.0, bottom: 13.0, right: 8.0, left: 8.0),
-                        child: CustomTextFormField<String>(
+                        child: RegistrationSearchDropDown<Zone>(
                           label: "المنطقة",
-                          hint: "مثال: \'المنصور\'",
-                          // controller: _CityIdController,
-                          dropdownItems: deliveryZones.isNotEmpty
-                              ? deliveryZones.map((zone) {
-                                  return DropdownMenuItem<String>(
-                                    value: zone.id?.toString() ?? '',
-                                    child: Text(zone.name ?? 'Unknown'),
-                                  );
-                                }).toList()
-                              : [],
-
-                          selectedValue: _SelectedCityId,
-                          onDropdownChanged: (value) {
+                          hint: _selectedGovernorateId == null
+                              ? "اختر المحافظة أولاً..."
+                              : "ابحث عن المنطقة...",
+                          selectedValue: deliveryZones
+                                      .firstWhere(
+                                        (zone) =>
+                                            zone.id?.toString() ==
+                                            _SelectedCityId,
+                                        orElse: () => Zone(),
+                                      )
+                                      .id !=
+                                  null
+                              ? deliveryZones.firstWhere(
+                                  (zone) =>
+                                      zone.id?.toString() == _SelectedCityId,
+                                )
+                              : null,
+                          itemAsString: (zone) => zone.name ?? 'غير محدد',
+                          asyncItems: (query) async {
+                            if (_selectedGovernorateId == null) {
+                              return <Zone>[];
+                            }
+                            if (query.isEmpty) {
+                              return deliveryZones;
+                            }
+                            return deliveryZones
+                                .where((zone) => (zone.name ?? '')
+                                    .toLowerCase()
+                                    .contains(query.toLowerCase()))
+                                .toList();
+                          },
+                          onChanged: (selectedZone) {
                             setState(() {
-                              _SelectedCityId = value;
+                              _SelectedCityId = selectedZone?.id?.toString();
                             });
                           },
-                          suffixInner: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: GestureDetector(
-                              onTap: () {},
-                              child: SvgPicture.asset(
-                                "assets/svg/CaretDown.svg",
-                                width: 24,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                            ),
-                          ),
                         ),
                       ),
                     ],
@@ -624,7 +651,9 @@ class _AddOrderScreenState extends ConsumerState<AddOrderScreen> {
       cameraFace: CameraFace.back,
     );
     setState(() {
-      _barcodeController.text = res ?? '';
+      if (res != null && res != '-1' && res.isNotEmpty) {
+        _barcodeController.text = res;
+      }
     });
   }
 }

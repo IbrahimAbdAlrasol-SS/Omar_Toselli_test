@@ -37,11 +37,16 @@ class _SupportRecordScreenState extends State<SupportRecordScreen> {
 
     return Scaffold(
       body: NestedScrollView(
+        // ************************************************ ممكن يسبب مشكلة بسلاسة اللمس ********************
+        physics: const BouncingScrollPhysics(), // تحسين سلاسة التمرير
+        // ************************************************************************************************
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
             SliverAppBar(
-              title: Text('قائمة الدعم السابق (${filteredSupports.length})',
-                  style: const TextStyle(fontSize: 20) , ),
+              title: Text(
+                'قائمة الدعم السابق (${filteredSupports.length})',
+                style: const TextStyle(fontSize: 20),
+              ),
               pinned: true,
               floating: true,
               actions: [
@@ -60,7 +65,7 @@ class _SupportRecordScreenState extends State<SupportRecordScreen> {
             ),
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(20),
                 child: Column(
                   children: [
                     // Search Bar
@@ -78,16 +83,20 @@ class _SupportRecordScreenState extends State<SupportRecordScreen> {
                       onChanged: (value) =>
                           setState(() => _searchQuery = value),
                     ),
-                    const Gap(10),
+                    const Gap(20),
 
                     // Status Filter Chips
+                    // ************************************************ ممكن يسبب مشكلة بسلاسة اللمس ********************
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
+                      physics:
+                          const BouncingScrollPhysics(), // تحسين سلاسة التمرير الأفقي
+                      // ************************************************************************************************
                       child: Row(
                         children: [
                           // زر "الكل"
                           Padding(
-                            padding: const EdgeInsets.only(right: 8),
+                            padding: const EdgeInsets.only(right: 12),
                             child: FilterChip(
                               label: Text(
                                 'الكل',
@@ -115,7 +124,7 @@ class _SupportRecordScreenState extends State<SupportRecordScreen> {
                                 ),
                               ),
                               labelPadding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 4),
+                                  horizontal: 16, vertical: 6),
                             ),
                           ),
 
@@ -124,7 +133,7 @@ class _SupportRecordScreenState extends State<SupportRecordScreen> {
                             final index = entry.key;
                             final status = entry.value;
                             return Padding(
-                              padding: const EdgeInsets.only(right: 8),
+                              padding: const EdgeInsets.only(right: 12),
                               child: FilterChip(
                                 label: Text(
                                   status.name,
@@ -152,7 +161,7 @@ class _SupportRecordScreenState extends State<SupportRecordScreen> {
                                   ),
                                 ),
                                 labelPadding: const EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 4),
+                                    horizontal: 16, vertical: 6),
                               ),
                             );
                           }),
@@ -171,8 +180,15 @@ class _SupportRecordScreenState extends State<SupportRecordScreen> {
               return const Center(child: Text('لا توجد نتائج'));
             }
 
+            // ************************************************ ممكن يسبب مشكلة بسلاسة اللمس ********************
             return ListView.builder(
               controller: _scrollController,
+              physics: const BouncingScrollPhysics(), // تحسين سلاسة التمرير
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 16,
+              ),
+              // ************************************************************************************************
               itemCount: filteredSupports.length,
               itemBuilder: (context, index) {
                 return SupportCardItem(
@@ -194,7 +210,7 @@ class _SupportRecordScreenState extends State<SupportRecordScreen> {
       isScrollControlled: true,
       builder: (context) {
         return Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -208,7 +224,7 @@ class _SupportRecordScreenState extends State<SupportRecordScreen> {
                 isExpanded: true,
                 onTap: () {},
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () => Navigator.pop(context),
                 child: const Text('إغلاق'),

@@ -24,8 +24,11 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       backgroundColor: Colors.transparent,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(20), // زيادة padding للشاشة
           child: SingleChildScrollView(
+            // ************************************************ ممكن يسبب مشكلة بسلاسة اللمس ********************
+            physics: const BouncingScrollPhysics(), // تحسين سلاسة التمرير
+            // ************************************************
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -92,34 +95,50 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                     ),
                   ],
                 ),
-                Gap(12),
-                Text(
-                  "أرباح اليوم",
-                  style: context.textTheme.titleMedium!.copyWith(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
+                Gap(16), // زيادة المسافة
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 4.0), // إضافة padding جانبي
+                  child: Text(
+                    "أرباح اليوم",
+                    style: context.textTheme.titleMedium!.copyWith(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
                   ),
                 ),
-                Gap(1),
+                Gap(8), // زيادة المسافة
 
-                buildCart(
-                  context,
-                  title: "إجمالي الأرباح",
-                  subtitle: '300,000',
-                  iconPath: "assets/svg/coines.svg",
-                  iconColor: const Color(0xFF16CA8B),
-                  expanded: false,
-                ),
-                Gap(14),
-                Text(
-                  "إحصائيات حالة الطلبات اليومية",
-                  style: context.textTheme.titleMedium!.copyWith(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 4.0), // إضافة padding للكارت
+                  child: buildCart(
+                    context,
+                    title: "إجمالي الأرباح",
+                    subtitle: '300,000',
+                    iconPath: "assets/svg/coines.svg",
+                    iconColor: const Color(0xFF16CA8B),
+                    expanded: false,
                   ),
                 ),
-                Gap(4),
-                _buildPieChart(context),
+                Gap(20), // زيادة المسافة
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 4.0), // إضافة padding
+                  child: Text(
+                    "إحصائيات حالة الطلبات اليومية",
+                    style: context.textTheme.titleMedium!.copyWith(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                Gap(12), // زيادة المسافة
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 4.0), // إضافة padding للرسم البياني
+                  child: _buildPieChart(context),
+                ),
                 Gap(12),
                 Text(
                   "إحصائيات الإيرادات الشهرية",

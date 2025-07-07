@@ -63,6 +63,11 @@ class _ZonesScreenState extends ConsumerState<ZonesScreen> {
         // ),
         child: SafeArea(
           child: SingleChildScrollView(
+            // ************************************************ ممكن يسبب مشكلة بسلاسة اللمس ********************
+            physics: const BouncingScrollPhysics(), // تحسين سلاسة التحكم
+            // ************************************************************************************************
+            padding: const EdgeInsets.symmetric(
+                horizontal: 12.0, vertical: 8.0), // تحسين padding عام
             child: Column(
               children: [
                 CustomAppBar(
@@ -86,7 +91,7 @@ class _ZonesScreenState extends ConsumerState<ZonesScreen> {
         ),
       ),
       bottomNavigationBar: Container(
-        padding: AppSpaces.allMedium,
+        padding: const EdgeInsets.all(20.0), // تحسين padding
         decoration: BoxDecoration(
             color: Colors.white,
             border: Border.all(
@@ -125,8 +130,10 @@ class _ZonesScreenState extends ConsumerState<ZonesScreen> {
   ListView _buildUi(List<Zone> zones) {
     return ListView.builder(
       shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      padding: AppSpaces.horizontalMedium,
+      // تحسين سلاسة التحكم - استخدام BouncingScrollPhysics بدلاً من NeverScrollableScrollPhysics
+      physics: const BouncingScrollPhysics(), // تحسين سلاسة التحكم
+      padding: const EdgeInsets.symmetric(
+          horizontal: 20.0, vertical: 12.0), // تحسين padding
       itemCount: zones.length,
       itemBuilder: (context, index) =>
           buildZoneCart(zones[index], Theme.of(context)),
@@ -135,8 +142,9 @@ class _ZonesScreenState extends ConsumerState<ZonesScreen> {
 
   Widget buildZoneCart(Zone zone, ThemeData theme) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 10),
+      margin: const EdgeInsets.only(bottom: 20), // تحسين المسافة بين العناصر
+      padding: const EdgeInsets.symmetric(
+          horizontal: 24, vertical: 18), // تحسين padding
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(32),
@@ -148,10 +156,10 @@ class _ZonesScreenState extends ConsumerState<ZonesScreen> {
       child: Row(
         children: [
           Padding(
-            padding: const EdgeInsets.only(left: 8.0),
+            padding: const EdgeInsets.only(left: 12.0),
             //? Location Icon
             child: Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(12),
               decoration: const BoxDecoration(
                 color: Color(0xFFEDE7F6),
                 shape: BoxShape.circle,
@@ -168,9 +176,10 @@ class _ZonesScreenState extends ConsumerState<ZonesScreen> {
               children: [
                 Text(
                   zone.name ?? 'لايوجد',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 6),
                 Text(
                   zone.governorate?.name ?? 'لايوجد',
                   style: TextStyle(fontSize: 14, color: Colors.grey),
@@ -205,9 +214,7 @@ class _ZonesScreenState extends ConsumerState<ZonesScreen> {
               "assets/svg/49. TrashSimple.svg",
               color: const Color(0xffE96363),
             ),
-            onPressed: () {
-              
-            },
+            onPressed: () {},
           ),
         ],
       ),

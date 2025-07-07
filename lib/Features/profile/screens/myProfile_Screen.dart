@@ -39,8 +39,13 @@ class _MyProfileScreenState extends ConsumerState<MyProfileScreen> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
         child: Padding(
-          padding: EdgeInsets.only(top: size.height * 0.06),
+          padding: EdgeInsets.only(
+            top: size.height * 0.06,
+            left: AppSpaces.medium,
+            right: AppSpaces.medium,
+          ),
           child: Column(
             children: [
               profileState.when(
@@ -185,7 +190,7 @@ class _MyProfileScreenState extends ConsumerState<MyProfileScreen> {
                           onTap: () => context.push(AppRoutes.deleteAccount)),
                     ],
                   ),
-                  const Gap(AppSpaces.large),
+                  const Gap(AppSpaces.medium),
                 ],
               )
             ],
@@ -200,15 +205,18 @@ class _MyProfileScreenState extends ConsumerState<MyProfileScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        padding: const EdgeInsets.symmetric(
+          vertical: 12.0,
+          horizontal: 8.0,
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Padding(
               padding: title == "عناوين الإستلام"
                   ? const EdgeInsets.only(
-                      top: 10, bottom: 10, right: 19, left: 10)
-                  : const EdgeInsets.all(10),
+                      top: 12, bottom: 12, right: 22, left: 12)
+                  : const EdgeInsets.all(12),
               child: SvgPicture.asset(
                 iconPath,
                 width: 24,
@@ -220,7 +228,7 @@ class _MyProfileScreenState extends ConsumerState<MyProfileScreen> {
                         : theme.colorScheme.primary,
               ),
             ),
-            if (title == "عناوين الإستلام") const Gap(5),
+            if (title == "عناوين الإستلام") const Gap(8),
             Text(
               title,
               style: TextStyle(
@@ -238,7 +246,12 @@ class _MyProfileScreenState extends ConsumerState<MyProfileScreen> {
 
   Padding buildLine(Size size) {
     return Padding(
-      padding: EdgeInsets.only(top: size.height * 0.023, bottom: 0.023),
+      padding: EdgeInsets.only(
+        top: size.height * 0.03,
+        bottom: size.height * 0.03,
+        left: AppSpaces.medium,
+        right: AppSpaces.medium,
+      ),
       child: SizedBox(
         height: 1,
         width: size.width * 0.93,

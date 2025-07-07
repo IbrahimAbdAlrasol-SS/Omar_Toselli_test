@@ -52,13 +52,10 @@ class _LoginPageState extends ConsumerState<ForgotPasswordNum> {
     //   },
     // );
 
-
 // رتبــها
     return loginState.when(
       data: (data) =>
-          _buildUi(
-            screenHeight, keyboardHeight, context, loginState
-            ),
+          _buildUi(screenHeight, keyboardHeight, context, loginState),
       loading: () =>
           _buildUi(screenHeight, keyboardHeight, context, loginState),
       error: (error, stackTrace) => Center(
@@ -148,7 +145,7 @@ class _LoginPageState extends ConsumerState<ForgotPasswordNum> {
                           child: CustomTextFormField(
                             label: "رقم الهاتف ",
                             hint: "07xx Xxx Xxx",
-                            keyboardType: TextInputType.phone,
+                            keyboardType: TextInputType.number,
                           ),
                         ),
                         const Gap(430),

@@ -31,13 +31,19 @@ class _NotificationPageState extends ConsumerState<NotificationPage> {
             ),
             Expanded(
               child: ListView.separated(
-                padding: AppSpaces.allMedium,
+                // BouncingScrollPhysics for better touch smoothness
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.all(20.0), // تحسين padding
                 itemCount: 3,
-                separatorBuilder: (context, index) => Divider(
-                  thickness: 0.1,
-                  color: Theme.of(context).colorScheme.secondary,
+                separatorBuilder: (context, index) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12.0),
+                  child: Divider(
+                    thickness: 0.1,
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
                 ),
-                itemBuilder: (context, index) => notificationItemWidget(context),
+                itemBuilder: (context, index) =>
+                    notificationItemWidget(context),
               ),
             ),
           ],
@@ -45,62 +51,62 @@ class _NotificationPageState extends ConsumerState<NotificationPage> {
       ),
     );
   }
-
 }
-  Widget notificationItemWidget(BuildContext context) {
-    return Container(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 40.w,
-            height: 40.w,
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(100),
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                border:
-                    Border.all(color: Theme.of(context).colorScheme.primary)),
-            child: Icon(
-              CupertinoIcons.bell,
-              color: Theme.of(context).colorScheme.primary,
-              size: 18.sp,
-            ),
+
+Widget notificationItemWidget(BuildContext context) {
+  return Container(
+    padding: const EdgeInsets.symmetric(
+        horizontal: 8.0, vertical: 12.0), // إضافة padding
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 40.w,
+          height: 40.w,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(100),
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              border: Border.all(color: Theme.of(context).colorScheme.primary)),
+          child: Icon(
+            CupertinoIcons.bell,
+            color: Theme.of(context).colorScheme.primary,
+            size: 18.sp,
           ),
-          const Gap(AppSpaces.small),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    
-                    Text(
-                      "تم تأكيد طلبك بنجاح",
-                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+        ),
+        const Gap(16), // تحسين المسافة
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "تم تأكيد طلبك بنجاح",
+                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  Text(
+                    timeAgoArabic(DateTime.now()),
+                    style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: context.colorScheme.secondary),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8), // تحسين المسافة
+              Text(
+                "تم تأكيد طلبك بنجاح ونعمل على تجهيزه وتوصيله في أقرب وقت",
+                style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                      color: Theme.of(context).colorScheme.secondary,
                     ),
-                    Text(timeAgoArabic(DateTime.now()),
-                    style:TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: context.colorScheme.secondary
-                    ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 5,),
-                Text(
-                  "تم تأكيد طلبك بنجاح ونعمل على تجهيزه وتوصيله في أقرب وقت",
-                  style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                        color: Theme.of(context).colorScheme.secondary,
-                      ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}

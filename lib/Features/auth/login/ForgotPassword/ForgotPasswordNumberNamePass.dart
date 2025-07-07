@@ -3,7 +3,7 @@ import 'package:Tosell/Features/auth/register/widgets/build_background.dart';
 import 'package:Tosell/core/widgets/Others/CustomAppBar.dart';
 import 'package:Tosell/core/widgets/buttons/FillButton.dart';
 import 'package:Tosell/core/widgets/inputs/CustomTextFormField.dart';
- 
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -118,7 +118,6 @@ class _ForgotPasswordNumberNamePassState
               ),
             ],
           ),
-
           // DraggableScrollableSheet for the bottom section
           DraggableScrollableSheet(
             initialChildSize: 0.66, // 69% of the screen height
@@ -144,7 +143,7 @@ class _ForgotPasswordNumberNamePassState
                           child: CustomTextFormField(
                             label: "الرمز السري الجديد",
                             hint: "***",
-                            keyboardType: TextInputType.phone,
+                            keyboardType: TextInputType.number,
                           ),
                         ),
                         const Padding(
@@ -152,7 +151,7 @@ class _ForgotPasswordNumberNamePassState
                           child: CustomTextFormField(
                             label: "تأكيد الرمز السري الجديد",
                             hint: "***",
-                            keyboardType: TextInputType.phone,
+                            keyboardType: TextInputType.number,
                           ),
                         ),
                         const Gap(300),

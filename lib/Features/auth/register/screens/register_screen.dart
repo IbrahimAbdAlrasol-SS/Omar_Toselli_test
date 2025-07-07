@@ -1,10 +1,10 @@
 import 'package:Tosell/Features/auth/login/providers/auth_provider.dart';
- import 'package:Tosell/core/config/routes/app_router.dart';
+import 'package:Tosell/Features/profile/models/zone.dart';
+import 'package:Tosell/core/config/routes/app_router.dart';
 import 'package:Tosell/core/utils/extensions/GlobalToast.dart';
 import 'package:Tosell/core/utils/extensions/extensions.dart';
 import 'package:Tosell/core/utils/helpers/SharedPreferencesHelper.dart';
 import 'package:Tosell/core/widgets/Others/CustomAppBar.dart';
-import 'package:Tosell/features/profile/data/models/zone.dart';
 import 'package:gap/gap.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
@@ -88,7 +88,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
     print('   المتجر: ${this.brandName}');
     print('   اسم المستخدم: ${this.userName}');
     print('   الهاتف: ${this.phoneNumber}');
-    print('   الصورة: ${this.brandImg?.isNotEmpty == true ? 'موجودة' : 'غير موجودة'}');
+    print(
+        '   الصورة: ${this.brandImg?.isNotEmpty == true ? 'موجودة' : 'غير موجودة'}');
   }
 
   /// ✅ تحديث المناطق والإحداثيات من DeliveryInfoTab
@@ -109,56 +110,64 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
   bool _validateData() {
     if (fullName?.isEmpty ?? true) {
       GlobalToast.show(
-        context: context,
-        message: 'اسم صاحب المتجر مطلوب', backgroundColor: Colors.red);
+          context: context,
+          message: 'اسم صاحب المتجر مطلوب',
+          backgroundColor: Colors.red);
       _tabController.animateTo(0);
       return false;
     }
     if (brandName?.isEmpty ?? true) {
       GlobalToast.show(
-        context: context,
-        message: 'اسم المتجر مطلوب', backgroundColor: Colors.red);
+          context: context,
+          message: 'اسم المتجر مطلوب',
+          backgroundColor: Colors.red);
       _tabController.animateTo(0);
       return false;
     }
     if (userName?.isEmpty ?? true) {
       GlobalToast.show(
-        context: context,
-        message: 'اسم المستخدم مطلوب', backgroundColor: Colors.red);
+          context: context,
+          message: 'اسم المستخدم مطلوب',
+          backgroundColor: Colors.red);
       _tabController.animateTo(0);
       return false;
     }
     if (phoneNumber?.isEmpty ?? true) {
       GlobalToast.show(
-        context: context,
-        message: 'رقم الهاتف مطلوب', backgroundColor: Colors.red);
+          context: context,
+          message: 'رقم الهاتف مطلوب',
+          backgroundColor: Colors.red);
       _tabController.animateTo(0);
       return false;
     }
     if (password?.isEmpty ?? true) {
       GlobalToast.show(
-        context: context,
-        message: 'كلمة المرور مطلوبة', backgroundColor: Colors.red);
+          context: context,
+          message: 'كلمة المرور مطلوبة',
+          backgroundColor: Colors.red);
       _tabController.animateTo(0);
       return false;
     }
     if (brandImg?.isEmpty ?? true) {
       GlobalToast.show(
-        context: context,
-        message: 'صورة المتجر مطلوبة', backgroundColor: Colors.red);
+          context: context,
+          message: 'صورة المتجر مطلوبة',
+          backgroundColor: Colors.red);
       _tabController.animateTo(0);
       return false;
     }
     if (selectedZones.isEmpty) {
       GlobalToast.show(
-        context: context,
-        message: 'يجب إضافة منطقة واحدة على الأقل', backgroundColor: Colors.red);
+          context: context,
+          message: 'يجب إضافة منطقة واحدة على الأقل',
+          backgroundColor: Colors.red);
       _tabController.animateTo(1);
       return false;
     }
 
     return true;
   }
+
   Future<void> _submitRegistration() async {
     if (!_validateData()) return;
 
@@ -168,17 +177,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
 
     try {
       final result = await ref.read(authNotifierProvider.notifier).register(
-        fullName: fullName!,
-        brandName: brandName!,
-        userName: userName!,
-        phoneNumber: phoneNumber!,
-        password: password!,
-        brandImg: brandImg!,
-        zones: selectedZones,
-        latitude: latitude,
-        longitude: longitude,
-        nearestLandmark: nearestLandmark,
-      );
+            fullName: fullName!,
+            brandName: brandName!,
+            userName: userName!,
+            phoneNumber: phoneNumber!,
+            password: password!,
+            brandImg: brandImg!,
+            zones: selectedZones,
+            latitude: latitude,
+            longitude: longitude,
+            nearestLandmark: nearestLandmark,
+          );
 
       if (result.$2 == "REGISTRATION_SUCCESS_PENDING_APPROVAL") {
         // ✅ تسجيل ناجح لكن يحتاج موافقة إدارية
@@ -189,30 +198,28 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
           backgroundColor: Colors.orange,
           textColor: Colors.white,
         );
-        
+
         await Future.delayed(const Duration(seconds: 3));
-        
+
         if (mounted) {
           // الانتقال إلى شاشة انتظار التفعيل
           context.go(AppRoutes.pendingActivation);
         }
-        
       } else if (result.$1 != null) {
-        // ✅ حالة مثالية: تم التسجيل والحصول على بيانات المستخدم مباشرة        
+        // ✅ حالة مثالية: تم التسجيل والحصول على بيانات المستخدم مباشرة
         await SharedPreferencesHelper.saveUser(result.$1!);
-        
+
         GlobalToast.showSuccess(
           context: context,
           message: 'مرحباً بك في توصيل! تم تفعيل حسابك بنجاح',
           durationInSeconds: 3,
         );
-        
+
         await Future.delayed(const Duration(seconds: 1));
-        
+
         if (mounted) {
           context.go(AppRoutes.home);
         }
-        
       } else {
         // ❌ خطأ حقيقي في التسجيل
         print('❌ فشل التسجيل: ${result.$2}');
@@ -223,7 +230,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
           durationInSeconds: 4,
         );
       }
-      
     } catch (e) {
       GlobalToast.show(
         context: context,
@@ -241,38 +247,41 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
   }
 
   Future<bool> _onWillPop() async {
-    if (fullName?.isNotEmpty == true || 
+    if (fullName?.isNotEmpty == true ||
         brandName?.isNotEmpty == true ||
         userName?.isNotEmpty == true ||
         phoneNumber?.isNotEmpty == true ||
         brandImg?.isNotEmpty == true ||
         selectedZones.isNotEmpty) {
       return await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text(
-            'تأكيد الخروج',
-            style: TextStyle(fontFamily: "Tajawal"),
-          ),
-          content: const Text(
-            'سيتم فقدان جميع البيانات المدخلة. هل تريد الخروج؟',
-            style: TextStyle(fontFamily: "Tajawal"),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('إلغاء', style: TextStyle(fontFamily: "Tajawal")),
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text(
+                'تأكيد الخروج',
+                style: TextStyle(fontFamily: "Tajawal"),
+              ),
+              content: const Text(
+                'سيتم فقدان جميع البيانات المدخلة. هل تريد الخروج؟',
+                style: TextStyle(fontFamily: "Tajawal"),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text('إلغاء',
+                      style: TextStyle(fontFamily: "Tajawal")),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  style: TextButton.styleFrom(foregroundColor: Colors.red),
+                  child: const Text('خروج',
+                      style: TextStyle(fontFamily: "Tajawal")),
+                ),
+              ],
             ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              style: TextButton.styleFrom(foregroundColor: Colors.red),
-              child: const Text('خروج', style: TextStyle(fontFamily: "Tajawal")),
-            ),
-          ],
-        ),
-      ) ?? false;
+          ) ??
+          false;
     }
-    
+
     return true;
   }
 
@@ -295,7 +304,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
             children: [
               _buildBackgroundSection(),
               _buildBottomSheetSection(),
-              
               if (_isSubmitting)
                 Container(
                   color: Colors.black.withOpacity(0.5),
@@ -347,10 +355,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                   titleWidget: Text(
                     'تسجيل دخول',
                     style: context.textTheme.bodyMedium!.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                      fontSize: 16
-                    ),
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                        fontSize: 16),
                   ),
                   showBackButton: true,
                   onBackButtonPressed: () async {
@@ -411,9 +418,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
 
   Widget _buildBottomSheetSection() {
     return DraggableScrollableSheet(
-      initialChildSize: 0.6,
-      minChildSize: 0.6,
-      maxChildSize: 0.7,
+      initialChildSize: 0.67,
+      minChildSize: 0.67,
+      maxChildSize: 0.9,
       builder: (context, scrollController) {
         return Container(
           decoration: const BoxDecoration(
@@ -428,7 +435,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
             children: [
               _buildTabBar(),
               Expanded(
-                
                 child: _buildTabBarView(),
               ),
             ],
@@ -462,8 +468,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                   decoration: BoxDecoration(
                     color: isSelected
                         ? Theme.of(context).colorScheme.primary
-                        : isCompleted 
-                            ? const Color(0xff8CD98C) 
+                        : isCompleted
+                            ? const Color(0xff8CD98C)
                             : const Color(0xffE1E7EA),
                     borderRadius: BorderRadius.circular(3),
                   ),
@@ -474,10 +480,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                   style: TextStyle(
                     color: isSelected
                         ? Theme.of(context).colorScheme.primary
-                        : isCompleted 
-                            ? const Color(0xff8CD98C) 
+                        : isCompleted
+                            ? const Color(0xff8CD98C)
                             : Theme.of(context).colorScheme.secondary,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    fontWeight:
+                        isSelected ? FontWeight.bold : FontWeight.normal,
                   ),
                 ),
               ],
@@ -507,7 +514,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
             },
           ),
         ),
-        
         SingleChildScrollView(
           child: Column(
             children: [
@@ -517,20 +523,23 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                 initialZones: selectedZones,
               ),
               // ****************************************
-              
+
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   border: Border(
-                    top: BorderSide(color: Theme.of(context).colorScheme.outline),
+                    top: BorderSide(
+                        color: Theme.of(context).colorScheme.outline),
                   ),
                 ),
                 child: Row(
                   children: [
                     Expanded(
                       child: OutlinedButton(
-                        onPressed: _isSubmitting ? null : () => _tabController.animateTo(0),
+                        onPressed: _isSubmitting
+                            ? null
+                            : () => _tabController.animateTo(0),
                         child: const Text('السابق'),
                       ),
                     ),

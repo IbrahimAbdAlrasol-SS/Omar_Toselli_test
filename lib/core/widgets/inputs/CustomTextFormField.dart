@@ -1,5 +1,6 @@
 import 'package:Tosell/core/config/constants/spaces.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gap/gap.dart';
 
 class CustomTextFormField<T> extends StatelessWidget {
@@ -124,6 +125,9 @@ class CustomTextFormField<T> extends StatelessWidget {
                       readOnly: readOnly,
                       controller: controller,
                       keyboardType: keyboardType,
+                      inputFormatters: keyboardType == TextInputType.number
+                          ? [FilteringTextInputFormatter.digitsOnly]
+                          : null,
                       obscureText: obscureText,
                       onFieldSubmitted: onFieldSubmitted,
                       onChanged: (value) {

@@ -1,10 +1,10 @@
 // lib/Features/auth/login/providers/auth_provider.dart
+import 'package:Tosell/Features/profile/models/zone.dart';
 import 'package:Tosell/features/auth/Services/auth_service.dart';
 import 'package:Tosell/core/api/client/BaseClient.dart';
 import 'package:Tosell/core/model_core/User.dart';
 import 'package:Tosell/core/utils/helpers/SharedPreferencesHelper.dart';
-import 'package:Tosell/features/profile/data/models/zone.dart';
-
+ 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'auth_provider.g.dart';

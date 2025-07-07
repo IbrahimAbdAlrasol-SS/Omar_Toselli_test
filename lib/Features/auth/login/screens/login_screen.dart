@@ -88,13 +88,16 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         const Gap(25),
                         CustomAppBar(
                           // title: "إنشاء حساب",
-                          titleWidget: Text('إنشاء حساب', style: context.textTheme.bodyMedium!.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                            fontSize: 16
-                          ),) ,
+                          titleWidget: Text(
+                            'إنشاء حساب',
+                            style: context.textTheme.bodyMedium!.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                                fontSize: 16),
+                          ),
                           showBackButton: true,
-                          onBackButtonPressed: () =>context.push(AppRoutes.registerScreen),
+                          onBackButtonPressed: () =>
+                              context.push(AppRoutes.registerScreen),
                         ),
                         Padding(
                           padding: const EdgeInsets.only(right: 20),
@@ -134,9 +137,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             ),
             // Login Form Sheet
             DraggableScrollableSheet(
-              initialChildSize: 0.58,
-              minChildSize: 0.58,
-              maxChildSize: 0.58,
+              initialChildSize: 0.67,
+              minChildSize: 0.67,
+              maxChildSize: 0.67,
               builder: (context, scrollController) {
                 return Material(
                   color: Colors.transparent,
@@ -171,6 +174,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                     controller: _phoneOrUsernameController,
                                     label: "رقم الهاتف",
                                     focusNode: _phoneFocusNode,
+                                    keyboardType: TextInputType.number,
                                     validator: (value) => value!.isEmpty
                                         ? "الرجاء إدخال اسم المستخدم أو الهاتف"
                                         : null,
@@ -198,7 +202,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                 ],
                               ),
                             ),
-                            const Gap(AppSpaces.medium),
+                            const Gap(AppSpaces.small),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
@@ -251,12 +255,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                     );
                                   } else {
                                     // التحقق من حالة انتظار التفعيل
-                                    if (result.$2 == "ACCOUNT_PENDING_ACTIVATION") {
+                                    if (result.$2 ==
+                                        "ACCOUNT_PENDING_ACTIVATION") {
                                       GlobalToast.show(
                                         context: context,
                                         message: "حسابك في انتظار التفعيل",
-                                        backgroundColor:
-                                            Colors.orange,
+                                        backgroundColor: Colors.orange,
                                         textColor: Colors.white,
                                       );
                                       // الانتقال إلى شاشة انتظار التفعيل

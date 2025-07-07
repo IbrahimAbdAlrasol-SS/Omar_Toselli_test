@@ -13,6 +13,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:Tosell/Features/profile/providers/profile_provider.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
@@ -129,6 +130,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       "رقم هاتف المتجر",
                       user.phoneNumber ?? "رقم الهاتف",
                       controller: phoneController,
+                      keyboardType: TextInputType.number,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'يرجى إدخال رقم الهاتف';
@@ -201,6 +203,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     String hint, {
     required TextEditingController controller,
     String? Function(String?)? validator,
+    TextInputType? keyboardType,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -222,6 +225,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           child: TextFormField(
             controller: controller,
             validator: validator,
+            keyboardType: keyboardType,
+            inputFormatters: keyboardType == TextInputType.number
+                ? [FilteringTextInputFormatter.digitsOnly]
+                : null,
             textAlign: TextAlign.right,
             decoration: InputDecoration(
               contentPadding:

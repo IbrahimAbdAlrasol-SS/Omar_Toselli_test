@@ -13,10 +13,12 @@ import 'package:Tosell/Features/order/orders/models/OrderFilter.dart';
 import 'package:Tosell/Features/order/orders/models/Shipment.dart';
 import 'package:Tosell/paging/generic_paged_list_view.dart';
 import 'package:Tosell/paging/generic_paged_grid_view.dart';
- import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
- 
+import 'package:Tosell/core/widgets/buttons/FillButton.dart';
+import 'package:Tosell/core/utils/extensions/extensions.dart';
+
 class OrdersListTab extends ConsumerStatefulWidget {
   final FetchPage<Order> fetchPage;
   final OrderFilter? filter;
@@ -42,6 +44,49 @@ class _OrdersListTabState extends ConsumerState<OrdersListTab>
         _selectedOrderIds.clear();
       }
     });
+  }
+
+  Widget _buildNoItemsFound() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset('assets/svg/NoItemsFound.gif', width: 240, height: 240),
+            Text(
+              'لا توجد طلبات مضافة',
+              style: context.textTheme.bodyLarge!.copyWith(
+                fontWeight: FontWeight.w700,
+                color: const Color(0xffE96363),
+                fontSize: 24,
+              ),
+            ),
+            const SizedBox(height: 7),
+            Text(
+              'اضغط على زر "جديد" لإضافة طلب جديد و ارساله الى زبونك',
+              style: context.textTheme.bodySmall!.copyWith(
+                fontWeight: FontWeight.w500,
+                color: const Color(0xff698596),
+                fontSize: 16,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: FillButton(
+                label: 'إضافة اول طلب',
+                onPressed: () => context.push(AppRoutes.addOrder),
+                icon: SvgPicture.asset('assets/svg/navigation_add.svg',
+                    color: const Color(0xffFAFEFD)),
+                reverse: true,
+              ),
+            )
+          ],
+        ),
+      ),
+    );
   }
 
   void _toggleOrderSelection(String orderId) {
@@ -81,14 +126,14 @@ class _OrdersListTabState extends ConsumerState<OrdersListTab>
     // فلترة الطلبات المتاحة فقط (status = 0: Pending أو 1: InPickUpShipment)
     final availableOrderIds = <String>[];
     final unavailableOrderIds = <String>[];
-    
+
     final ordersState = ref.read(ordersNotifierProvider);
     final currentOrders = ordersState.value ?? [];
-    
+
     for (String orderId in _selectedOrderIds) {
       try {
         final order = currentOrders.where((order) => order.id == orderId).first;
-        
+
         if (order.status == 0 || order.status == 1) {
           availableOrderIds.add(orderId);
         } else {
@@ -101,17 +146,21 @@ class _OrdersListTabState extends ConsumerState<OrdersListTab>
     }
 
     if (availableOrderIds.isEmpty) {
-      _showMessage('جميع الطلبات المحددة غير متاحة للشحن.\nيمكن شحن الطلبات في حالة "في الانتظار" أو "في شحنة الاستحصال" فقط.', Colors.orange);
+      _showMessage(
+          'جميع الطلبات المحددة غير متاحة للشحن.\nيمكن شحن الطلبات في حالة "في الانتظار" أو "في شحنة الاستحصال" فقط.',
+          Colors.orange);
       return;
     }
-    
+
     if (unavailableOrderIds.isNotEmpty) {
-      _showMessage('تم استبعاد ${unavailableOrderIds.length} طلب غير متاح للشحن', Colors.orange);
+      _showMessage(
+          'تم استبعاد ${unavailableOrderIds.length} طلب غير متاح للشحن',
+          Colors.orange);
     }
 
     // تحضير البيانات
     final orders = availableOrderIds.map((id) => {'orderId': id}).toList();
-    
+
     final shipmentData = {
       'delivered': null,
       'delegateId': null,
@@ -119,25 +168,28 @@ class _OrdersListTabState extends ConsumerState<OrdersListTab>
       'orders': orders,
       'priority': null
     };
-    
+
     // إرسال الطلب
-    final result = await ref.read(shipmentsNotifierProvider.notifier)
+    final result = await ref
+        .read(shipmentsNotifierProvider.notifier)
         .createShipment(shipmentData: shipmentData);
 
     // معالجة النتيجة
     if (result.$1 != null) {
-      _showMessage('تم إنشاء الشحنة بنجاح (${availableOrderIds.length} طلب)', Colors.green);
+      _showMessage('تم إنشاء الشحنة بنجاح (${availableOrderIds.length} طلب)',
+          Colors.green);
       _resetSelection();
     } else {
       // معالجة أنواع الأخطاء المختلفة
       String errorMessage = result.$2 ?? 'فشل في إنشاء الشحنة';
-      
+
       if (errorMessage.contains('Order already in shipment')) {
-        errorMessage = 'بعض الطلبات المحددة موجودة بالفعل في شحنة أخرى غير مكتملة.\nيرجى اختيار طلبات أخرى أو التحقق من حالة الطلبات.';
+        errorMessage =
+            'بعض الطلبات المحددة موجودة بالفعل في شحنة أخرى غير مكتملة.\nيرجى اختيار طلبات أخرى أو التحقق من حالة الطلبات.';
       } else if (errorMessage.contains('400')) {
         errorMessage = 'خطأ في البيانات المرسلة. يرجى المحاولة مرة أخرى.';
       }
-      
+
       _showMessage(errorMessage, Colors.red);
     }
   }
@@ -157,7 +209,7 @@ class _OrdersListTabState extends ConsumerState<OrdersListTab>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context); 
+    super.build(context);
 
     return Scaffold(
       body: Column(
@@ -300,6 +352,7 @@ class _OrdersListTabState extends ConsumerState<OrdersListTab>
                 }
                 return result;
               },
+              noItemsFoundIndicatorBuilder: _buildNoItemsFound(),
             ),
           ),
         ],

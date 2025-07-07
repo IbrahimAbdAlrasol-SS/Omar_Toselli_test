@@ -1,11 +1,9 @@
-
+import 'package:Tosell/Features/profile/models/zone.dart';
 import 'package:Tosell/core/config/routes/app_router.dart';
 import 'package:Tosell/core/utils/extensions/extensions.dart';
 import 'package:Tosell/core/widgets/inputs/CustomTextFormField.dart';
 import 'package:Tosell/core/widgets/inputs/custom_search_drop_down.dart';
-import 'package:Tosell/features/profile/data/models/zone.dart';
-import 'package:Tosell/features/profile/data/services/governorate_service.dart';
-import 'package:Tosell/features/profile/data/services/zone_service.dart';
+
 import 'package:gap/gap.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -13,6 +11,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../profile/services/governorate_service.dart';
+import '../../../profile/services/zone_service.dart';
 
 class ZoneLocationInfo {
   Governorate? selectedGovernorate;
@@ -20,6 +20,7 @@ class ZoneLocationInfo {
   String nearestLandmark;
   double? latitude;
   double? longitude;
+  String? expectedOrders;
 
   ZoneLocationInfo({
     this.selectedGovernorate,
@@ -27,6 +28,7 @@ class ZoneLocationInfo {
     this.nearestLandmark = '',
     this.latitude,
     this.longitude,
+    this.expectedOrders,
   });
 
   ZoneLocationInfo copyWith({
@@ -35,6 +37,7 @@ class ZoneLocationInfo {
     String? nearestLandmark,
     double? latitude,
     double? longitude,
+    String? expectedOrders,
   }) {
     return ZoneLocationInfo(
       selectedGovernorate: selectedGovernorate ?? this.selectedGovernorate,
@@ -42,6 +45,7 @@ class ZoneLocationInfo {
       nearestLandmark: nearestLandmark ?? this.nearestLandmark,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
+      expectedOrders: expectedOrders ?? this.expectedOrders,
     );
   }
 
@@ -460,7 +464,7 @@ class _DeliveryInfoTabState extends ConsumerState<DeliveryInfoTab> {
           onTap: () => _openLocationPicker(index, zoneInfo),
           borderRadius: BorderRadius.circular(16),
           child: Container(
-            height: 100,
+            height: 172,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
@@ -469,44 +473,85 @@ class _DeliveryInfoTabState extends ConsumerState<DeliveryInfoTab> {
                     : context.colorScheme.outline,
                 width: hasLocation ? 2 : 1,
               ),
-              color: hasLocation
-                  ? context.colorScheme.primary.withOpacity(0.05)
-                  : Colors.grey.withOpacity(0.05),
+              image: const DecorationImage(
+                image: AssetImage('assets/images/Map.png'),
+                fit: BoxFit.cover,
+              ),
             ),
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SvgPicture.asset(
-                    'assets/svg/MapPinLine.svg',
-                    color:
-                        hasLocation ? context.colorScheme.primary : Colors.grey,
-                    height: 24,
-                  ),
-                  const Gap(15),
-                  Text(
-                    hasLocation ? 'تم تحديد الموقع' : 'تحديد الموقع',
-                    style: context.textTheme.bodyMedium?.copyWith(
-                      fontSize: 16,
-                      color: hasLocation
-                          ? context.colorScheme.primary
-                          : Colors.grey,
-                      fontWeight: FontWeight.w500,
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                color: Colors.black.withOpacity(0.6),
+              ),
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/svg/MapPinLine.svg',
+                      color: context.colorScheme.primary,
+                      height: 24,
                     ),
-                  ),
-                  if (hasLocation) ...[
-                    const Gap(4),
+                    const Gap(15),
                     Text(
-                      'اضغط للتعديل',
-                      style: context.textTheme.bodySmall?.copyWith(
-                        color: context.colorScheme.primary.withOpacity(0.7),
+                      hasLocation ? 'تم تحديد الموقع' : 'تحديد الموقع',
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        fontSize: 16,
+                        color: context.colorScheme.primary,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
+                    if (hasLocation) ...[
+                      const Gap(4),
+                      Text(
+                        'اضغط للتعديل',
+                        style: context.textTheme.bodySmall?.copyWith(
+                          color: context.colorScheme.primary.withOpacity(0.7),
+                        ),
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
             ),
           ),
+        ),
+        const Gap(20),
+        _buildExpectedOrdersField(index, zoneInfo),
+      ],
+    );
+  }
+
+  Widget _buildExpectedOrdersField(int index, ZoneLocationInfo zoneInfo) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'الطلبات اليومية المتوقعة',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w500,
+                fontSize: 16,
+              ),
+        ),
+        const Gap(5),
+        CustomTextFormField<String>(
+          label: '',
+          showLabel: false,
+          hint: 'اختر عدد الطلبات المتوقعة',
+          dropdownItems: [
+            const DropdownMenuItem(value: '0-10', child: Text('0-10')),
+            const DropdownMenuItem(value: '11-20', child: Text('11-20')),
+            const DropdownMenuItem(value: '21-30', child: Text('21-30')),
+            const DropdownMenuItem(value: '31-40', child: Text('31-40')),
+            const DropdownMenuItem(value: '41-50', child: Text('41-50')),
+          ],
+          selectedValue: zoneInfo.expectedOrders,
+          onDropdownChanged: (value) {
+            setState(() {
+              zones[index] = zones[index].copyWith(expectedOrders: value);
+            });
+            _updateParent();
+          },
         ),
       ],
     );

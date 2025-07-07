@@ -118,8 +118,7 @@ class _UserInfoTabState extends ConsumerState<UserInfoTab> {
           });
 
           GlobalToast.showSuccess(
-            context: context,
-            message: 'تم رفع الصورة بنجاح');
+              context: context, message: 'تم رفع الصورة بنجاح');
 
           _saveCurrentData();
         } else {
@@ -256,7 +255,7 @@ class _UserInfoTabState extends ConsumerState<UserInfoTab> {
               focusNode: _phoneFocus,
               label: "رقم هاتف المتجر",
               hint: "07xx Xxx Xxx",
-              keyboardType: TextInputType.phone,
+              keyboardType: TextInputType.number,
               prefixInner: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: SvgPicture.asset(
@@ -344,7 +343,10 @@ class _UserInfoTabState extends ConsumerState<UserInfoTab> {
                   child: SvgPicture.asset(
                     _obscurePassword
                         ? "assets/svg/10. EyeSlash.svg"
-                        : "assets/svg/10. EyeSlash.svg",
+                        : "assets/svg/eye.svg",
+                    color: _obscurePassword
+                        ? null
+                        : Theme.of(context).colorScheme.primary,
                   ),
                 ),
               ),
@@ -379,7 +381,10 @@ class _UserInfoTabState extends ConsumerState<UserInfoTab> {
                   child: SvgPicture.asset(
                     _obscureConfirmPassword
                         ? "assets/svg/10. EyeSlash.svg"
-                        : "assets/svg/10. EyeSlash.svg",
+                        : "assets/svg/eye.svg",
+                    color: _obscureConfirmPassword
+                        ? null
+                        : Theme.of(context).colorScheme.primary,
                   ),
                 ),
               ),

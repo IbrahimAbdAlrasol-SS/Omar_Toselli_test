@@ -173,9 +173,7 @@ class _OrderRatingScreenState extends State<OrderRatingScreen> {
                       child: FillButton(
                         color: theme.primary,
                         label: "ارسال التقييم",
-                        onPressed: () {
-                  
-                        },
+                        onPressed: () {},
                       ),
                     ),
                   ],

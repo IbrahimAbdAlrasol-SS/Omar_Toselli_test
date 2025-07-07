@@ -1,12 +1,13 @@
 import 'dart:io';
 
+import 'package:Tosell/Features/profile/services/governorate_service.dart';
+import 'package:Tosell/Features/profile/services/zone_service.dart';
 import 'package:Tosell/core/config/routes/app_router.dart';
 import 'package:Tosell/core/config/theme/ThemeNotifier.dart';
 import 'package:Tosell/core/config/theme/app_theme.dart';
 import 'package:Tosell/core/utils/helpers/HttpOverrides.dart';
 import 'package:Tosell/core/utils/helpers/SharedPreferencesHelper.dart';
-import 'package:Tosell/features/profile/data/services/governorate_service.dart';
-import 'package:Tosell/features/profile/data/services/zone_service.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';

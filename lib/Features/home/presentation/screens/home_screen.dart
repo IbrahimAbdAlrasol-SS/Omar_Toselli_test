@@ -1,4 +1,5 @@
- import 'package:Tosell/Features/profile/providers/profile_provider.dart';
+import 'package:Tosell/Features/profile/providers/profile_provider.dart';
+import 'package:Tosell/Features/profile/screens/myProfile_Screen.dart';
 import 'package:Tosell/core/config/constants/spaces.dart';
 import 'package:Tosell/core/config/routes/app_router.dart';
 import 'package:Tosell/core/model_core/User.dart';
@@ -6,7 +7,6 @@ import 'package:Tosell/core/widgets/Others/CustomAppBar.dart';
 import 'package:Tosell/core/widgets/Others/build_cart.dart';
 import 'package:Tosell/features/home/data/models/Home.dart';
 import 'package:Tosell/features/home/presentation/providers/home_provider.dart';
-import 'package:Tosell/features/profile/presentation/screens/myProfile_Screen.dart';
 import 'package:gap/gap.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -88,12 +88,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
         Expanded(
           child: SingleChildScrollView(
+            // ************************************************ ممكن يسبب مشكلة بسلاسة اللمس ********************
+            physics: const BouncingScrollPhysics(), // تحسين سلاسة التحكم
+            // ************************************************************************************************
+            padding: const EdgeInsets.symmetric(
+                horizontal: 8.0, vertical: 4.0), // تحسين padding عام
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Gap(AppSpaces.small),
-                buildTitle(title: "إحصائيات عامة"),
-                const Gap(AppSpaces.small),
+                const Gap(AppSpaces.medium), // زيادة المسافة
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8.0), // إضافة padding للعنوان
+                  child: buildTitle(title: "إحصائيات عامة"),
+                ),
+                const Gap(AppSpaces.medium), // زيادة المسافة
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: Row(
@@ -143,13 +152,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ),
                 const Gap(AppSpaces.large),
-                buildTitle(
-                  title: "إحصائيات هذا اليوم",
-                  more: true,
-                  onTap: () =>
-                      GoRouter.of(context).push(AppRoutes.transactions),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8.0), // إضافة padding للعنوان
+                  child: buildTitle(
+                    title: "إحصائيات هذا اليوم",
+                    more: true,
+                    onTap: () =>
+                        GoRouter.of(context).push(AppRoutes.transactions),
+                  ),
                 ),
-                const Gap(AppSpaces.small),
+                const Gap(AppSpaces.medium), // زيادة المسافة
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: buildCart(
@@ -186,18 +199,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ),
                 const Gap(AppSpaces.large),
-                buildTitle(
-                  title: "أبرز الطلبات",
-                  more: true,
-                  onTap: () => GoRouter.of(context).push(AppRoutes.orders),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8.0), // إضافة padding للعنوان
+                  child: buildTitle(
+                    title: "أبرز الطلبات",
+                    more: true,
+                    onTap: () => GoRouter.of(context).push(AppRoutes.orders),
+                  ),
                 ),
+                const Gap(AppSpaces.small),
+                // تحسين سلاسة التحكم - استخدام BouncingScrollPhysics بدلاً من NeverScrollableScrollPhysics
                 ListView.builder(
                   itemCount: home.orders?.length ?? 0,
                   shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
+                  physics: const BouncingScrollPhysics(), // تحسين سلاسة التحكم
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8.0, vertical: 4.0),
                   itemBuilder: (context, index) => Padding(
                     padding: const EdgeInsets.only(
-                        bottom: 7.0, left: 8.0, right: 8.0),
+                        bottom: 12.0, left: 16.0, right: 16.0), // تحسين padding
                     child: GestureDetector(
                       onTap: () => context.push(AppRoutes.orderDetails,
                           extra: home.orders?[index].id),
@@ -214,19 +235,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                   ),
                 ),
-                buildTitle(
-                  title: "إشعاراتك اليوم",
-                  more: true,
-                  onTap: () => GoRouter.of(context).push(AppRoutes.orders),
+                const Gap(AppSpaces.medium), // إضافة مسافة
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8.0), // إضافة padding للعنوان
+                  child: buildTitle(
+                    title: "إشعاراتك اليوم",
+                    more: true,
+                    onTap: () => GoRouter.of(context).push(AppRoutes.orders),
+                  ),
                 ),
+                const Gap(AppSpaces.small),
+                // تحسين سلاسة التحكم - استخدام BouncingScrollPhysics بدلاً من NeverScrollableScrollPhysics
                 ListView.separated(
                   shrinkWrap: true,
-                  padding: AppSpaces.allMedium,
-                  physics: const NeverScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(20.0), // تحسين padding
+                  physics: const BouncingScrollPhysics(), // تحسين سلاسة التحكم
                   itemCount: 3,
-                  separatorBuilder: (context, index) => Divider(
-                    thickness: 0.1,
-                    color: Theme.of(context).colorScheme.secondary,
+                  separatorBuilder: (context, index) => Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Divider(
+                      thickness: 0.1,
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
                   ),
                   itemBuilder: (context, index) =>
                       notificationItemWidget(context),

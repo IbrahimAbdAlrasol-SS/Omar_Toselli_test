@@ -1,6 +1,9 @@
 import 'dart:collection';
 
- import 'package:Tosell/Features/order/screens/order_state_bottom_sheet.dart';
+import 'package:Tosell/Features/order/orders/models/Order.dart';
+import 'package:Tosell/Features/order/orders/models/order_enum.dart';
+import 'package:Tosell/Features/order/providers/order_commands_provider.dart';
+import 'package:Tosell/Features/order/screens/order_state_bottom_sheet.dart';
 import 'package:Tosell/core/config/constants/spaces.dart';
 import 'package:Tosell/core/config/routes/app_router.dart';
 import 'package:Tosell/core/utils/extensions/GlobalToast.dart';
@@ -11,9 +14,7 @@ import 'package:Tosell/core/widgets/buttons/FillButton.dart';
 import 'package:Tosell/core/widgets/buttons/OutlineButton.dart';
 import 'package:Tosell/core/widgets/inputs/CustomTextFormField.dart';
 import 'package:Tosell/core/widgets/layouts/custom_section.dart';
-import 'package:Tosell/features/orders/data/models/Order.dart';
-import 'package:Tosell/features/orders/data/models/order_enum.dart';
-import 'package:Tosell/features/orders/presentation/providers/order_commands_provider.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -315,7 +316,6 @@ class _ChangeStateScreenState extends ConsumerState<ChangeStateScreen> {
                             } else {
                               GlobalToast.show(
                                 context: context,
-
                                 message: 'تمت العملية بنجاح',
                                 backgroundColor: context.colorScheme.primary,
                                 textColor: Colors.white,

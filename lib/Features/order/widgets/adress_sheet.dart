@@ -4,11 +4,11 @@ import 'package:gap/gap.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
- 
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:Tosell/Features/profile/models/zone.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
- import 'package:Tosell/Features/order/widgets/google_map_widget.dart';
+import 'package:Tosell/Features/order/widgets/google_map_widget.dart';
 
 class AdressSheet extends ConsumerStatefulWidget {
   // final Address? address;
@@ -49,36 +49,44 @@ class _LoginPageState extends ConsumerState<AdressSheet> {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
 
+    // ************************************************ ممكن يسبب مشكلة بسلاسة اللمس ********************
     return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(), // تحسين سلاسة التمرير
+      // ************************************************************************************************
       child: Container(
-        decoration: BoxDecoration(
-          color: context.colorScheme.surface,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(24),
-            topRight: Radius.circular(24),
+          decoration: BoxDecoration(
+            color: context.colorScheme.surface,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(24),
+              topRight: Radius.circular(24),
+            ),
           ),
-        ),
-        child: Column(
+          child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                 const SizedBox(height: 15,),
+                  const SizedBox(
+                    height: 20,
+                  ),
                   Center(
                     child: Container(
                       height: 2,
                       width: 150,
-                      decoration:  const BoxDecoration(
-                        color: Color(0xffEAEEF0),
-                        borderRadius: BorderRadius.all(Radius.circular(64))
-                        
-                      ),
+                      decoration: const BoxDecoration(
+                          color: Color(0xffEAEEF0),
+                          borderRadius: BorderRadius.all(Radius.circular(64))),
                     ),
                   ),
                   _buildDropdown("المحافظة", "مثال: 'بغداد'"),
+                  const Gap(8),
                   _buildDropdown("المنطقة", "مثال: 'المنصور'"),
+                  const Gap(8),
                   _buildTextField("اقرب نقطة دالة", "مثال: 'قرب مطعم الخيمة'"),
+                  const Gap(12),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: Text(
                       'الموقع',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -88,7 +96,8 @@ class _LoginPageState extends ConsumerState<AdressSheet> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(16),
                       child: Stack(
@@ -99,13 +108,15 @@ class _LoginPageState extends ConsumerState<AdressSheet> {
                             fit: BoxFit.cover,
                           ),
                           Positioned.fill(
-                            child: Container(color: Colors.black.withOpacity(0.5)),
+                            child:
+                                Container(color: Colors.black.withOpacity(0.5)),
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Padding(
-                                padding: const EdgeInsets.only(bottom: 5, left: 3),
+                                padding:
+                                    const EdgeInsets.only(bottom: 5, left: 3),
                                 child: SvgPicture.asset(
                                   'assets/svg/MapPinLine.svg',
                                   color: context.colorScheme.primary,
@@ -125,16 +136,19 @@ class _LoginPageState extends ConsumerState<AdressSheet> {
                       ),
                     ),
                   ),
+                  const Gap(12),
                   _buildDropdown("معدل الطلبات اليومي المتوقع", "0 - 10"),
-                  const SizedBox(height: 30,),
+                  const SizedBox(
+                    height: 40,
+                  ),
                 ],
-              )
-      ),
+              ))),
     );
   }
-   Widget _buildDropdown(String label, String hint) {
+
+  Widget _buildDropdown(String label, String hint) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 13),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
       child: CustomTextFormField<String>(
         label: label,
         hint: hint,
@@ -160,9 +174,9 @@ class _LoginPageState extends ConsumerState<AdressSheet> {
     );
   }
 
-   Widget _buildTextField(String label, String hint) {
+  Widget _buildTextField(String label, String hint) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 13),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
       child: CustomTextFormField(
         label: label,
         hint: hint,

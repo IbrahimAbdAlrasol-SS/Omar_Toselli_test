@@ -197,9 +197,11 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                   borderSide: BorderSide.none,
                 ),
                 suffixIcon: IconButton(
-                  icon: Icon(
-                    visible ? Icons.visibility : Icons.visibility_off,
-                    color: context.colorScheme.primary,
+                  icon: SvgPicture.asset(
+                    visible
+                        ? "assets/svg/eye.svg"
+                        : "assets/svg/10. EyeSlash.svg",
+                    color: visible ? context.colorScheme.primary : null,
                   ),
                   onPressed: toggleVisibility,
                 ),
